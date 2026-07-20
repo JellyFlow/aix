@@ -1,112 +1,100 @@
 # AIX
 
-`aix` 是一组围绕 **`.aix` (AI eXecutable)** 包格式的工具链，面向 Ink Mini Program / Agent 场景，提供：
+AIX 是一种面向 AI agents 的可执行包格式。
 
-- Rust 核心库：读取、解析和分析 `.aix` 包
-- CLI 工具：将目录打包为 `.aix`，或查看包内容
-- Web/WASM 绑定：在浏览器和 TypeScript 环境中读取 `.aix`
+它把页面、schema 和 tools 打包成一个可分发的 artifact，同时保持对 Rust 工具、命令行和浏览器环境可读。
 
-`.aix` 本质上是一个 zip 包，承载 Agent 定义、页面资源和运行时元信息。当前仓库里的相关实现都位于 `crates/` 下。
+## 仓库包含什么
 
-## 仓库结构
+这个仓库是一个 Rust workspace，包含三层面向格式本身的实现：
+
+- `crates/aix`：AIX 的核心定义、包读取、页面分析和 tool 推导
+- `crates/aix-cli`：用于打包、校验和检查 `.aix` artifact 的命令行入口
+- `crates/aix-web`：面向浏览器的 WASM 和 TypeScript 接口
+- `docs`：官方文档站，包含 `Specification`、`Packages` 和 `Play`
+
+## Workspace 结构
 
 ```text
-crates/
-├── aix/         # Rust 核心库：AixReader、页面分析、工具定义生成
-├── aix-cli/     # 命令行工具：aix pack / aix list
-└── aix-web/     # 面向浏览器 AIX 工具链的 WebAssembly + TypeScript 封装
+.
+├── crates/
+│   ├── aix/
+│   ├── aix-cli/
+│   └── aix-web/
+├── docs/
+├── Cargo.toml
+└── README.zh-CN.md
 ```
 
-## 模块说明
+## AIX 承载什么
+
+`.aix` 不只是一个 zip 包，它是一个保留结构语义的 artifact，可以承载：
+
+- 包内文件与版本元信息
+- 应用和页面定义
+- schema 定义的输入契约
+- 布局与目标环境提示
+- 面向 AI agents 的派生 tool surface
+
+因此，同一个 `.aix` 包可以被 Rust、CLI 和 Web/WASM 工具链读取，而不丢失其原生结构。
+
+## Packages
 
 ### `crates/aix`
 
-核心 Rust 库，负责解析 `.aix` 包并暴露统一读取接口，主要能力包括：
+核心 crate 定义了 AIX 的读取模型，主要负责：
 
 - 列出包内文件
-- 读取指定文件
-- 获取 `VERSION`
-- 从 `app.json` 读取应用标题
-- 解析页面定义并提取 `schema`
-- 基于页面结构和样式分析页面尺寸约束
-- 为页面生成 OpenAI-compatible tool 定义
-
-当前同时支持两种页面格式：
-
-1. 传统多文件格式
-   - `page.json`
-   - `page.js`
-   - `page.wxml`
-   - `page.wxss` / `page.wcss`
-2. 单文件组件格式
-   - `page.ink`
+- 读取归档中的具体文件
+- 解析版本和标题元信息
+- 解析页面定义
+- 提取页面 schema
+- 基于包内容推导 tool 定义
 
 ### `crates/aix-cli`
 
-命令行工具，二进制名称为 `aix`，主要用于打包和检查 `.aix` 文件。
+CLI 把格式能力转成终端工作流，目前主要包括：
 
-当前支持：
-
-- `aix pack <INPUT_DIR>`
-  - 将目录打成 `.aix`
-  - 自动生成根 `VERSION` 文件
-  - 校验 `.json` 文件是否合法
-  - 自动将 `.json` / `.js` / `.ink` 的非 UTF-8 内容转换为 UTF-8 后再写入包内
-  - 支持 PNG / JPEG 优化和 JSON 压缩
-  - 支持 `.aixignore`
-- `aix list <AIX_FILE>`
-  - 列出包内文件及压缩前后大小
-  - 支持别名 `aix ls`
+- `aix pack <INPUT_DIR>`：构建 `.aix` artifact
+- `aix list <AIX_FILE>` 或 `aix ls <AIX_FILE>`：检查包内容
+- 打包阶段的校验与规范化处理
+- `.aixignore` 支持与可选优化流程
 
 ### `crates/aix-web`
 
-基于 `aix` 核心库提供 WebAssembly 封装，并在 `ts/` 中暴露 TypeScript API，适合在浏览器中读取 `.aix` 文件。
+Web 包通过 WASM 和 TypeScript 暴露同一套 AIX 能力。
 
-主要能力包括：
+典型接口包括：
 
-- `AIX.From(data)` 从 `Uint8Array` 或 `File` 初始化实例
-- `list()` 获取包中文件列表
-- `readFile(name)` 读取原始文件内容
-- `getVersion()` 获取版本号
-- `getTitle()` 获取应用标题
-- `getPages()` 获取页面信息
-- `getTools()` 获取页面导出的 tool 定义
+- `AIX.From(data)`，从 `Uint8Array` 或 `File` 初始化
+- `list()`，获取包内文件
+- `readFile(name)`，读取原始文件
+- `getVersion()`、`getTitle()`、`getPages()` 和 `getTools()`
 
-官方浏览器检查界面现在是集成在文档站里的 Package Lab，路由为 `/play`。
+这个包对应的官方浏览器入口是 `docs/play.md`，发布后的路由是 `/play`。
 
-## AIX 包格式
-
-`.aix` 包是一种面向 Ink Mini Program / Agent 场景的 zip 形式应用包，用来承载：
-
-- Agent 元数据与能力描述
-- 应用级配置与运行时入口文件
-- 页面定义与 UI 资源
-- 可进一步转成 tool 定义的页面 schema
-
-在实际使用中，这一格式同时支持传统多文件页面和 `.ink` 单文件组件，因此可以被本仓库中的 Rust、CLI 与 Web/WASM 工具链统一消费。
-
-## AIX 包结构
-
-一个典型的 `.aix` 包通常包含以下文件：
+## 典型包结构
 
 ```text
 .
 ├── AGENTS.md
+├── VERSION
 ├── app.json
 ├── app.js
 └── pages/
 ```
 
-其中：
+这些文件通常表示：
 
-- `AGENTS.md` 描述 Agent 身份与能力
-- `app.json` 描述应用配置、路由和窗口信息
-- `app.js` 是应用逻辑入口
-- `pages/` 存放页面定义
+- `AGENTS.md`：agent 身份和能力上下文
+- `VERSION`：包版本
+- `app.json`：应用级元数据和路由配置
+- `app.js`：运行时入口逻辑
+- `pages/`：页面定义、资源以及包含 schema 的文件
 
 ## 快速开始
 
-### 1. 在 Rust 中读取 `.aix`
+### 在 Rust 中读取 AIX
 
 ```rust
 use aix::AixReader;
@@ -115,12 +103,8 @@ fn main() -> anyhow::Result<()> {
     let data = std::fs::read("bundle.aix")?;
     let reader = AixReader::new(data)?;
 
-    for entry in reader.list() {
-        println!("{} ({})", entry.name, entry.size);
-    }
-
-    println!("title = {:?}", reader.get_title());
     println!("version = {:?}", reader.get_version());
+    println!("title = {:?}", reader.get_title());
     println!("pages = {:?}", reader.get_pages());
     println!("tools = {:?}", reader.get_tools());
 
@@ -128,28 +112,20 @@ fn main() -> anyhow::Result<()> {
 }
 ```
 
-### 2. 用 CLI 打包目录
+### 用 CLI 打包或检查
 
 ```bash
-cargo run --manifest-path crates/aix-cli/Cargo.toml -- pack ./my-agent -o bundle.aix
+cargo run -p aix-cli -- pack ./my-agent -o bundle.aix
 ```
-
-开启优化：
 
 ```bash
-cargo run --manifest-path crates/aix-cli/Cargo.toml -- pack ./my-agent -o bundle.aix -O --opt-level 3
+cargo run -p aix-cli -- list ./bundle.aix
 ```
 
-查看包内容：
-
-```bash
-cargo run --manifest-path crates/aix-cli/Cargo.toml -- list ./bundle.aix
-```
-
-### 3. 在 Web 中读取 `.aix`
+### 在浏览器中读取 AIX
 
 ```ts
-import { AIX } from '@yodaos-pkg/aix';
+import { AIX } from "@yodaos-pkg/aix";
 
 async function inspect(file: File) {
   const aix = await AIX.From(file);
@@ -159,63 +135,38 @@ async function inspect(file: File) {
 }
 ```
 
-## 本地开发
+## 文档站
 
-### Rust 核心库
+文档站位于 `docs/`，当前主要包括三个路由：
 
-运行 `aix` 测试：
+- `/spec`：AIX Specification 概览
+- `/packages`：workspace 中各 package 的职责
+- `/play`：在浏览器里上传并检查真实的 `.aix` artifact
 
-```bash
-cargo test --manifest-path crates/aix/Cargo.toml
-```
-
-### CLI
-
-运行 `aix-cli` 测试：
+本地启动：
 
 ```bash
-cargo test --manifest-path crates/aix-cli/Cargo.toml
+cd docs
+npm install
+npm run dev
 ```
 
-本地执行 CLI：
+## 开发
+
+在仓库根目录进行基础校验：
 
 ```bash
-cargo run --manifest-path crates/aix-cli/Cargo.toml -- --help
+cargo test -p aix -p aix-cli
+cargo check -p aix-web --target wasm32-unknown-unknown
 ```
 
-### Web / WASM
-
-安装依赖：
+构建 Web 包输出：
 
 ```bash
 cd crates/aix-web
 npm install
-```
-
-构建 WASM 与 TS 输出：
-
-```bash
 npm run build
 ```
-
-安装 docs 依赖：
-
-```bash
-cd ../../docs
-npm install
-```
-
-启动文档站：
-
-```bash
-npm run dev
-```
-
-## 当前状态
-
-- 当前仓库代码主体位于 `crates/`
-- 根目录已经存在 `Cargo.toml`，但还没有把这些 crate 注册为 workspace members
-- 如果后续希望统一通过根目录执行 `cargo test`、`cargo run -p ...` 或共享 workspace 依赖，可以再补齐根 workspace 配置
 
 ## License
 

@@ -1,112 +1,100 @@
 # AIX
 
-`aix` is a toolchain built around the **`.aix` (AI eXecutable)** package format for Ink Mini Program / Agent scenarios. It provides:
+AIX is an executable package format for AI agents.
 
-- A Rust core library for reading, parsing, and analyzing `.aix` packages
-- A CLI for packing directories into `.aix` files and inspecting package contents
-- Web/WASM bindings for reading `.aix` packages in browsers and TypeScript environments
+It packages pages, schema, and tools into a distributable artifact that stays readable to Rust tooling, the command line, and the browser.
 
-An `.aix` file is essentially a zip archive that contains agent definitions, page assets, and runtime metadata. The current implementation in this repository lives under `crates/`.
+## What This Repository Contains
 
-## Repository Layout
+This repository is a Rust workspace with three package-facing surfaces:
+
+- `crates/aix`: the core format definition, package reader, page analysis, and tool derivation layer
+- `crates/aix-cli`: the command-line surface for packaging, validating, and inspecting `.aix` artifacts
+- `crates/aix-web`: the WASM and TypeScript surface for browser-based AIX inspection and integration
+- `docs`: the official documentation site, including `Specification`, `Packages`, and `Play`
+
+## Workspace Layout
 
 ```text
-crates/
-├── aix/         # Rust core library: AixReader, page analysis, tool generation
-├── aix-cli/     # Command-line tool: aix pack / aix list
-└── aix-web/     # WebAssembly + TypeScript bindings for browser-facing AIX tooling
+.
+├── crates/
+│   ├── aix/
+│   ├── aix-cli/
+│   └── aix-web/
+├── docs/
+├── Cargo.toml
+└── README.md
 ```
 
-## Modules
+## What AIX Carries
+
+An `.aix` package is more than a zip archive. It is a structured artifact that can preserve:
+
+- package entries and version metadata
+- app and page definitions
+- schema-defined inputs
+- layout and target hints
+- derived tool surfaces for AI agents
+
+In practice, the same package can be read by Rust, CLI, and Web/WASM tooling without losing the package-native structure.
+
+## Packages
 
 ### `crates/aix`
 
-The core Rust library parses `.aix` packages and exposes a unified reading API. Its main capabilities include:
+The core crate defines the AIX reading model. It is responsible for:
 
-- Listing files inside a package
-- Reading a specific file
-- Reading the `VERSION` file
-- Extracting the app title from `app.json`
-- Parsing page definitions and extracting page `schema`
-- Analyzing page size constraints from page structure and styles
-- Generating OpenAI-compatible tool definitions from pages
-
-The library currently supports two page formats:
-
-1. Traditional multi-file format
-   - `page.json`
-   - `page.js`
-   - `page.wxml`
-   - `page.wxss` / `page.wcss`
-2. Single-file component format
-   - `page.ink`
+- listing package entries
+- reading files from the archive
+- resolving version and title metadata
+- parsing page definitions
+- extracting page schema
+- deriving tool definitions from package data
 
 ### `crates/aix-cli`
 
-The command-line tool exposes the `aix` binary and is mainly used to pack and inspect `.aix` files.
+The CLI turns the format into terminal workflows. It currently focuses on:
 
-Current features:
-
-- `aix pack <INPUT_DIR>`
-  - Packs a directory into an `.aix` file
-  - Automatically generates a root-level `VERSION` file
-  - Validates all `.json` files before packaging
-  - Converts non-UTF-8 `.json`, `.js`, and `.ink` files to UTF-8 before writing them into the archive
-  - Supports PNG / JPEG optimization and JSON minification
-  - Respects `.aixignore`
-- `aix list <AIX_FILE>`
-  - Lists package files and their original / compressed sizes
-  - Supports the alias `aix ls`
+- `aix pack <INPUT_DIR>` for building `.aix` artifacts
+- `aix list <AIX_FILE>` or `aix ls <AIX_FILE>` for inspecting package contents
+- validation and normalization during packaging
+- `.aixignore` support and optional optimization paths
 
 ### `crates/aix-web`
 
-This module builds on top of the `aix` core library and provides WebAssembly bindings plus a TypeScript API for reading `.aix` files in web environments.
+The web package exposes the same AIX model through WASM and TypeScript APIs.
 
-Main capabilities:
+Typical capabilities include:
 
-- `AIX.From(data)` initializes from a `Uint8Array` or `File`
-- `list()` returns the file list
-- `readFile(name)` reads raw file content
-- `getVersion()` returns the package version
-- `getTitle()` returns the app title
-- `getPages()` returns parsed page information
-- `getTools()` returns generated tool definitions
+- `AIX.From(data)` from `Uint8Array` or `File`
+- `list()` for package entries
+- `readFile(name)` for raw file access
+- `getVersion()`, `getTitle()`, `getPages()`, and `getTools()`
 
-The official browser inspection surface is the docs-integrated Package Lab at `/play`.
+The official browser surface for this package is `docs/play.md`, published as `/play`.
 
-## AIX Package Format
-
-An `.aix` package is a zip-based application bundle for Ink Mini Program / Agent scenarios. It is used to package:
-
-- Agent metadata and capability descriptions
-- App-level configuration and runtime entry files
-- Page definitions and UI resources
-- Optional page schemas that can be turned into tool definitions
-
-In practice, the format supports both traditional multi-file pages and `.ink` single-file components, allowing the same package to be consumed by Rust, CLI, and Web/WASM tooling in this repository.
-
-## AIX Package Structure
-
-A typical `.aix` package usually contains:
+## Typical Package Shape
 
 ```text
 .
 ├── AGENTS.md
+├── VERSION
 ├── app.json
 ├── app.js
 └── pages/
 ```
 
-Where:
+Typical files include:
 
-- `AGENTS.md` describes the agent identity and capabilities
-- `app.json` contains app configuration, routing, and window metadata
-- `app.js` is the app logic entry
-- `pages/` contains page definitions
+- `AGENTS.md` for agent identity and capability context
+- `VERSION` for package versioning
+- `app.json` for app-level metadata and routing
+- `app.js` for runtime entry logic
+- `pages/` for page definitions, assets, and schema-bearing files
 
 ## Quick Start
 
-### 1. Read `.aix` in Rust
+### Read AIX in Rust
 
 ```rust
 use aix::AixReader;
@@ -115,12 +103,8 @@ fn main() -> anyhow::Result<()> {
     let data = std::fs::read("bundle.aix")?;
     let reader = AixReader::new(data)?;
 
-    for entry in reader.list() {
-        println!("{} ({})", entry.name, entry.size);
-    }
-
-    println!("title = {:?}", reader.get_title());
     println!("version = {:?}", reader.get_version());
+    println!("title = {:?}", reader.get_title());
     println!("pages = {:?}", reader.get_pages());
     println!("tools = {:?}", reader.get_tools());
 
@@ -128,28 +112,20 @@ fn main() -> anyhow::Result<()> {
 }
 ```
 
-### 2. Pack a Directory with the CLI
+### Package Or Inspect With The CLI
 
 ```bash
-cargo run --manifest-path crates/aix-cli/Cargo.toml -- pack ./my-agent -o bundle.aix
+cargo run -p aix-cli -- pack ./my-agent -o bundle.aix
 ```
-
-Enable optimization:
 
 ```bash
-cargo run --manifest-path crates/aix-cli/Cargo.toml -- pack ./my-agent -o bundle.aix -O --opt-level 3
+cargo run -p aix-cli -- list ./bundle.aix
 ```
 
-Inspect package contents:
-
-```bash
-cargo run --manifest-path crates/aix-cli/Cargo.toml -- list ./bundle.aix
-```
-
-### 3. Read `.aix` on the Web
+### Read AIX In The Browser
 
 ```ts
-import { AIX } from '@yodaos-pkg/aix';
+import { AIX } from "@yodaos-pkg/aix";
 
 async function inspect(file: File) {
   const aix = await AIX.From(file);
@@ -159,63 +135,38 @@ async function inspect(file: File) {
 }
 ```
 
-## Local Development
+## Docs Site
 
-### Rust Core Library
+The documentation site lives in `docs/` and is organized around three primary routes:
 
-Run tests for `aix`:
+- `/spec`: the AIX specification overview
+- `/packages`: the workspace package surfaces
+- `/play`: upload and inspect real `.aix` artifacts in the browser
 
-```bash
-cargo test --manifest-path crates/aix/Cargo.toml
-```
-
-### CLI
-
-Run tests for `aix-cli`:
+Run it locally:
 
 ```bash
-cargo test --manifest-path crates/aix-cli/Cargo.toml
+cd docs
+npm install
+npm run dev
 ```
 
-Run the CLI locally:
+## Development
+
+Validate the workspace from the repository root:
 
 ```bash
-cargo run --manifest-path crates/aix-cli/Cargo.toml -- --help
+cargo test -p aix -p aix-cli
+cargo check -p aix-web --target wasm32-unknown-unknown
 ```
 
-### Web / WASM
-
-Install dependencies:
+Build the web package outputs:
 
 ```bash
 cd crates/aix-web
 npm install
-```
-
-Build the WASM and TypeScript outputs:
-
-```bash
 npm run build
 ```
-
-Install docs dependencies:
-
-```bash
-cd ../../docs
-npm install
-```
-
-Start the docs site:
-
-```bash
-npm run dev
-```
-
-## Current Status
-
-- The main code currently lives under `crates/`
-- The repository root already has a `Cargo.toml`, but these crates are not yet registered as workspace members
-- If you want to run `cargo test`, `cargo run -p ...`, or share workspace dependencies from the root, the workspace configuration can be completed later
 
 ## License
 
