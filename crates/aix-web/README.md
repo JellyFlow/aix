@@ -1,0 +1,188 @@
+# @yodaos-pkg/aix
+
+`@yodaos-pkg/aix` is a library for reading and managing **.aix** (AI eXecutable) packages in the web environment using WASM. The `.aix` format is an extension of the [Open Agent Format (OAF)](https://openagentformat.com/spec.html), designed to package AI agents with rich UI/UX capabilities powered by Ink Mini Programs.
+
+## Installation
+
+```bash
+npm install @yodaos-pkg/aix
+```
+
+## Quick Start
+
+Here is a quick example of how to load an `.aix` package:
+
+```typescript
+import { AIX } from '@yodaos-pkg/aix';
+
+// Option 1: Load from a URL
+async function fromUrl() {
+  const response = await fetch('https://example.com/my-agent.aix');
+  const buffer = await response.arrayBuffer();
+  const aix = await AIX.From(new Uint8Array(buffer));
+  console.log('App Title:', aix.getTitle());
+}
+
+// Option 2: Load from a File object (e.g., from an <input type="file">)
+async function fromFile(file: File) {
+  const aix = await AIX.From(file);
+  console.log('App Title:', aix.getTitle());
+}
+```
+
+## Using the Playground
+
+`aix-web` includes a local playground for trying `.aix` packages in the browser.
+
+If you are developing inside this repository, install dependencies in `packages/aix-web` first:
+
+```bash
+npm install
+```
+
+1. Build the local `aix-web` package:
+
+```bash
+npm run build
+```
+
+This step builds the `aix-web` WebAssembly bundle and TypeScript output into `dist/`, which is what the playground loads locally.
+
+2. Start the playground:
+
+```bash
+npm run dev
+```
+
+3. Open the local Vite URL shown in the terminal, usually:
+
+```text
+http://localhost:5173
+```
+
+4. Upload an `.aix` file in the page to inspect:
+
+- package title and version
+- parsed `pages`
+- generated OpenAI-compatible `tools`
+- package file list and raw file contents
+
+This is useful for verifying whether `app.json`, page schemas, and `getTools()` output match expectations while developing or debugging an AIX package.
+
+## API Reference
+
+### `AIX` Class
+
+The main class to interact with an AIX package.
+
+#### `static async From(data: Uint8Array | File): Promise<AIX>`
+Initializes the WASM module and creates an AIX instance from the given `.aix` file content. It supports both `Uint8Array` and the standard Web `File` object.
+```typescript
+// From Uint8Array
+const aix = await AIX.From(new Uint8Array(buffer));
+
+// From File (Web API)
+const aix = await AIX.From(file);
+```
+
+#### `list(): AixEntry[]`
+Lists all files in the AIX package.
+```typescript
+const files = aix.list();
+// [{ name: "app.json", size: 123, compressed_size: 45 }, ...]
+```
+
+#### `readFile(name: string): Uint8Array`
+Reads the raw content of a specific file from the package.
+```typescript
+const content = aix.readFile('app.json');
+const text = new TextDecoder().decode(content);
+```
+
+#### `getVersion(): string | undefined`
+Returns the version metadata from the `VERSION` file in the package.
+```typescript
+const version = aix.getVersion();
+```
+
+#### `getTitle(): string | undefined`
+Extracts the navigation bar title from the `app.json`.
+```typescript
+const title = aix.getTitle();
+```
+
+#### `getPages(): PageInfo[]`
+Returns information about all pages defined in the package, including their paths, titles, and data schemas.
+```typescript
+const pages = aix.getPages();
+/*
+[{
+  name: "pages/index/index",
+  title: "Home",
+  data_schema: { ... }
+}]
+*/
+```
+
+#### `getTools(): Tool[]`
+Generates a list of OpenAI-compatible tool definitions based on the pages and their schemas.
+```typescript
+const tools = aix.getTools();
+/*
+[{
+  type: "function",
+  function: {
+    name: "pages_index_index",
+    description: "Home",
+    parameters: { ... }
+  }
+}]
+*/
+```
+
+## Data Types
+
+### `AixEntry`
+```typescript
+interface AixEntry {
+  name: string;
+  size: number;
+  compressed_size: number;
+}
+```
+
+### `PageInfo`
+```typescript
+interface PageInfo {
+  name: string;
+  title?: string;
+  data_schema: any;
+}
+```
+
+### `Tool`
+OpenAI compatible tool format.
+```typescript
+interface Tool {
+  type: string;
+  function: {
+    name: string;
+    description?: string;
+    parameters: any;
+  };
+}
+```
+
+## Build
+
+To build the library for distribution:
+
+```bash
+npm run build
+```
+
+The output will be generated in the `dist` directory, including WASM binaries and TypeScript definitions.
+
+## License
+
+MIT

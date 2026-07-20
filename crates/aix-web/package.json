@@ -1,0 +1,25 @@
+{
+  "name": "@yodaos-pkg/aix",
+  "version": "0.1.0",
+  "description": "Ink AIX Package Reader",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "pkg/",
+    "dist/"
+  ],
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {},
+  "repository": {
+    "url": "https://github.com/jsar-project/ink"
+  },
+  "scripts": {
+    "build:wasm": "wasm-pack build --target web --out-dir dist/pkg --out-name aix_web",
+    "build:ts": "tsc",
+    "build": "node scripts/build.js",
+    "build:playground": "npm run build --prefix playground",
+    "dev": "npm run dev --prefix playground"
+  }
+}
