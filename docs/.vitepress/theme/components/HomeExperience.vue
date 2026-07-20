@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { withBase } from "vitepress";
 import PackageTreeDemo from "./PackageTreeDemo.vue";
 
 const readingLayers = [
@@ -42,7 +43,7 @@ const readingFlow = [
 const packageSections = [
   {
     kicker: "Core package",
-    title: "AIX Format Core",
+    title: null,
     definition:
       "The `aix` crate defines the AIX format itself. It provides the package reading model, page analysis logic, and the structural semantics that every other tool in the repository builds on.",
     usage:
@@ -56,7 +57,7 @@ const packageSections = [
   },
   {
     kicker: "CLI package",
-    title: "Command-Line Workflows",
+    title: null,
     definition:
       "The `aix-cli` crate turns the format model into terminal workflows. It is the command-line entry point for packaging, validating, and inspecting `.aix` artifacts.",
     usage:
@@ -70,7 +71,7 @@ const packageSections = [
   },
   {
     kicker: "Web package",
-    title: "Browser Format Tooling",
+    title: null,
     definition:
       "The `aix-web` crate makes the same format capabilities available in the browser. It exposes AIX through WASM bindings and supports interactive inspection surfaces such as the Package Lab.",
     usage:
@@ -83,6 +84,10 @@ const packageSections = [
     ]
   }
 ];
+
+const specHref = withBase("/spec");
+const packagesHref = withBase("/packages");
+const playHref = withBase("/play");
 </script>
 
 <template>
@@ -91,18 +96,13 @@ const packageSections = [
       <div class="aix-doc-container aix-doc-hero-grid">
         <div class="aix-doc-hero-copy">
           <p class="aix-doc-kicker">AIX file format</p>
-          <h1 class="aix-doc-hero-title">
-            AIX is a readable package format for page structure, schema-defined inputs, and derived
-            tool surfaces.
-          </h1>
+          <h1 class="aix-doc-hero-title">AIX is an executable package format for AI.</h1>
           <p class="aix-doc-hero-lead">
-            Instead of treating the packaged artifact as an opaque archive, AIX keeps enough
-            structure for readers to inspect the package tree, interpret page metadata, and map
-            schema-bearing surfaces into tool contracts.
+            It packages pages, schema, and tools into a distributable artifact for AI agents.
           </p>
           <div class="aix-doc-hero-actions">
-            <a class="aix-doc-button aix-doc-button-dark" href="/aix/format">Read the format</a>
-            <a class="aix-doc-button aix-doc-button-light" href="/aix/playground/">Open Package Lab</a>
+            <a class="aix-doc-button aix-doc-button-dark" :href="specHref">Specification</a>
+            <a class="aix-doc-button aix-doc-button-light" :href="playHref">Play with AIX</a>
           </div>
         </div>
 
@@ -114,7 +114,7 @@ const packageSections = [
       <div class="aix-doc-container">
         <div class="aix-doc-section-head">
           <p class="aix-doc-kicker">Reading model</p>
-          <h2>Three layers explain why AIX behaves like a format, not only an archive.</h2>
+          <h2>Readable from the start.</h2>
           <p>
             The homepage should immediately tell readers what the package contains, how those files
             define pages, and how schema expands that structure into runtime-facing surfaces.
@@ -134,7 +134,7 @@ const packageSections = [
       <div class="aix-doc-container">
         <div class="aix-doc-section-head">
           <p class="aix-doc-kicker">How readers interpret AIX</p>
-          <h2>The model expands in a predictable technical sequence.</h2>
+          <h2>From package to tool.</h2>
         </div>
 
         <div class="aix-doc-flow">
@@ -149,12 +149,12 @@ const packageSections = [
       </div>
     </section>
 
-    <section v-for="pkg in packageSections" :key="pkg.title" class="aix-doc-section aix-doc-package-section">
+    <section v-for="pkg in packageSections" :key="pkg.kicker" class="aix-doc-section aix-doc-package-section">
       <div class="aix-doc-container">
         <div class="aix-doc-package-grid">
           <div class="aix-doc-section-head aix-doc-package-copy">
             <p class="aix-doc-kicker">{{ pkg.kicker }}</p>
-            <h2>{{ pkg.title }}</h2>
+            <h2 v-if="pkg.title">{{ pkg.title }}</h2>
             <div class="aix-doc-prose">
               <p>{{ pkg.definition }}</p>
               <p>{{ pkg.usage }}</p>
@@ -179,17 +179,10 @@ const packageSections = [
 
     <section class="aix-doc-section aix-doc-final">
       <div class="aix-doc-container aix-doc-final-grid">
-        <div>
-          <p class="aix-doc-kicker">Next step</p>
-          <h2>Read the specification, then validate a real artifact.</h2>
-          <p>
-            The docs define how the format works. The Package Lab lets you inspect a real `.aix`
-            artifact through the same conceptual model.
-          </p>
-        </div>
+        <p class="aix-doc-kicker">Next Step</p>
         <div class="aix-doc-hero-actions">
-          <a class="aix-doc-button aix-doc-button-dark" href="/aix/packages">Explore packages</a>
-          <a class="aix-doc-button aix-doc-button-light" href="/aix/playground/">Launch Package Lab</a>
+          <a class="aix-doc-button aix-doc-button-dark" :href="packagesHref">Explore packages</a>
+          <a class="aix-doc-button aix-doc-button-light" :href="playHref">Play with AIX</a>
         </div>
       </div>
     </section>

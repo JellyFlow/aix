@@ -11,5 +11,10 @@
   "devDependencies": {
     "gsap": "^3.13.0",
     "vitepress": "^1.6.3"
+  },
+  "dependencies": {
+    "@yodaos-pkg/aix": "file:../crates/aix-web",
+    "vite-plugin-top-level-await": "^1.6.0",
+    "vite-plugin-wasm": "^3.6.0"
   }
 }

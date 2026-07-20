@@ -18,8 +18,6 @@
   "scripts": {
     "build:wasm": "wasm-pack build --target web --out-dir dist/pkg --out-name aix_web",
     "build:ts": "tsc",
-    "build": "node scripts/build.js",
-    "build:playground": "npm run build --prefix playground",
-    "dev": "npm run dev --prefix playground"
+    "build": "node scripts/build.js"
   }
 }

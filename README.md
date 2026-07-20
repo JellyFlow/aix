@@ -14,7 +14,7 @@ An `.aix` file is essentially a zip archive that contains agent definitions, pag
 crates/
 ├── aix/         # Rust core library: AixReader, page analysis, tool generation
 ├── aix-cli/     # Command-line tool: aix pack / aix list
-└── aix-web/     # WebAssembly + TypeScript bindings and local playground
+└── aix-web/     # WebAssembly + TypeScript bindings for browser-facing AIX tooling
 ```
 
 ## Modules
@@ -72,7 +72,7 @@ Main capabilities:
 - `getPages()` returns parsed page information
 - `getTools()` returns generated tool definitions
 
-The repository also includes a local playground for inspecting `.aix` contents and debugging page parsing in the browser.
+The official browser inspection surface is the docs-integrated Package Lab at `/play`.
 
 ## AIX Package Format
 
@@ -198,7 +198,14 @@ Build the WASM and TypeScript outputs:
 npm run build
 ```
 
-Start the playground:
+Install docs dependencies:
+
+```bash
+cd ../../docs
+npm install
+```
+
+Start the docs site:
 
 ```bash
 npm run dev

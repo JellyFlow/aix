@@ -48,9 +48,9 @@ The docs site explains the model.
 
 The packages implement the model.
 
-The playground demonstrates the model against real `.aix` artifacts.
+The Package Lab demonstrates the model against real `.aix` artifacts.
 
 ## Explore Further
 
-- Read the [Format overview](/format)
-- Open the [Playground guide](/playground)
+- Read the [Specification](/spec)
+- Open the [Package Lab](/play)

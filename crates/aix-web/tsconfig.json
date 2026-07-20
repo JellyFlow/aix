@@ -13,5 +13,5 @@
   },
   "include": ["ts/**/*"],
   "files": ["ts/index.ts"],
-  "exclude": ["node_modules", "pkg", "playground"]
+  "exclude": ["node_modules", "pkg"]
 }

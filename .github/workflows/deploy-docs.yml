@@ -29,7 +29,6 @@ jobs:
           cache-dependency-path: |
             docs/package-lock.json
             crates/aix-web/package-lock.json
-            crates/aix-web/playground/package-lock.json
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
@@ -50,30 +49,15 @@ jobs:
         run: npm ci
         working-directory: crates/aix-web
 
-      - name: Install playground dependencies
-        run: npm ci
-        working-directory: crates/aix-web/playground
-
       - name: Build aix-web package
         run: npm run build
         working-directory: crates/aix-web
-
-      - name: Build playground
-        run: npm run build
-        working-directory: crates/aix-web/playground
-        env:
-          VITE_BASE_PATH: /aix/playground/
 
       - name: Build docs
         run: npm run build
         working-directory: docs
         env:
           BASE_PATH: /aix
-
-      - name: Copy playground into docs artifact
-        run: |
-          mkdir -p docs/.vitepress/dist/playground
-          cp -R crates/aix-web/playground/dist/. docs/.vitepress/dist/playground/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

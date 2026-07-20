@@ -14,7 +14,7 @@
 crates/
 ├── aix/         # Rust 核心库：AixReader、页面分析、工具定义生成
 ├── aix-cli/     # 命令行工具：aix pack / aix list
-└── aix-web/     # WebAssembly + TypeScript 封装，以及本地 playground
+└── aix-web/     # 面向浏览器 AIX 工具链的 WebAssembly + TypeScript 封装
 ```
 
 ## 模块说明
@@ -72,7 +72,7 @@ crates/
 - `getPages()` 获取页面信息
 - `getTools()` 获取页面导出的 tool 定义
 
-仓库里还包含一个本地 playground，便于在浏览器里调试 `.aix` 包内容与页面解析结果。
+官方浏览器检查界面现在是集成在文档站里的 Package Lab，路由为 `/play`。
 
 ## AIX 包格式
 
@@ -198,7 +198,14 @@ npm install
 npm run build
 ```
 
-启动 playground：
+安装 docs 依赖：
+
+```bash
+cd ../../docs
+npm install
+```
+
+启动文档站：
 
 ```bash
 npm run dev

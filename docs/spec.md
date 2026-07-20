@@ -1,4 +1,4 @@
-# Format
+# Specification
 
 AIX is a file format for packaging application structure, page metadata, and schema-defined inputs in a way that remains readable to both tooling and humans.
 
@@ -48,4 +48,4 @@ Different runtimes can read the same conceptual artifact:
 ## Explore Further
 
 - Continue to [Packages](/packages)
-- Open the [Playground guide](/playground)
+- Open the [Package Lab](/play)

@@ -30,11 +30,11 @@ async function fromFile(file: File) {
 }
 ```
 
-## Using the Playground
+## Using the Package Lab
 
-`aix-web` includes a local playground for trying `.aix` packages in the browser.
+The official browser lab now lives in the docs site at `/play`.
 
-If you are developing inside this repository, install dependencies in `packages/aix-web` first:
+If you are developing inside this repository, install dependencies in `crates/aix-web` first:
 
 ```bash
 npm install
@@ -46,28 +46,35 @@ npm install
 npm run build
 ```
 
-This step builds the `aix-web` WebAssembly bundle and TypeScript output into `dist/`, which is what the playground loads locally.
+This step builds the `aix-web` WebAssembly bundle and TypeScript output into `dist/`, which is what the docs-integrated Package Lab loads.
 
-2. Start the playground:
+2. Install the docs dependencies:
+
+```bash
+cd ../../docs
+npm install
+```
+
+3. Start the docs site:
 
 ```bash
 npm run dev
 ```
 
-3. Open the local Vite URL shown in the terminal, usually:
+4. Open the local VitePress URL shown in the terminal, then navigate to `/play`, usually:
 
 ```text
-http://localhost:5173
+http://localhost:5173/aix/play
 ```
 
-4. Upload an `.aix` file in the page to inspect:
+5. Upload an `.aix` file in the page to inspect:
 
 - package title and version
 - parsed `pages`
 - generated OpenAI-compatible `tools`
 - package file list and raw file contents
 
-This is useful for verifying whether `app.json`, page schemas, and `getTools()` output match expectations while developing or debugging an AIX package.
+This is useful for verifying whether `app.json`, page schemas, and `getTools()` output match expectations while developing or debugging an AIX package inside the official docs experience.
 
 ## API Reference
 

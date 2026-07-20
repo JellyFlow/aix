@@ -1,4 +1,7 @@
 import { defineConfig } from "vitepress";
+import { searchForWorkspaceRoot } from "vite";
+import wasm from "vite-plugin-wasm";
+import topLevelAwait from "vite-plugin-top-level-await";
 
 function normalizeBasePath(input: string | undefined): string {
   if (!input || input === "/") {
@@ -16,11 +19,22 @@ const runtimeProcess = globalThis as typeof globalThis & {
 };
 
 const base = normalizeBasePath(runtimeProcess.process?.env?.BASE_PATH ?? "/aix");
+const docsRoot = new URL("..", import.meta.url).pathname;
+const workspaceRoot = searchForWorkspaceRoot(docsRoot);
+const aixWebRoot = new URL("../../crates/aix-web/", import.meta.url).pathname;
 
 export default defineConfig({
   title: "AIX",
   description: "Official documentation and package lab for the AIX file format.",
   base,
+  vite: {
+    plugins: [wasm(), topLevelAwait()],
+    server: {
+      fs: {
+        allow: [workspaceRoot, aixWebRoot]
+      }
+    }
+  },
   appearance: false,
   lastUpdated: true,
   cleanUrls: true,
@@ -36,21 +50,19 @@ export default defineConfig({
     ]
   ],
   themeConfig: {
+    siteTitle: '<span class="aix-brand-aiui">AIUI</span> <span class="aix-brand-aix">AIX</span>',
     nav: [
-      { text: "Format", link: "/format" },
-      { text: "Docs", link: "/format" },
+      { text: "Specification", link: "/spec" },
       { text: "Packages", link: "/packages" },
-      { text: "Playground", link: "/playground" },
+      { text: "Play", link: "/play" },
       { text: "GitHub", link: "https://github.com/jsar-project/aix" }
     ],
     sidebar: [
       {
         text: "AIX",
         items: [
-          { text: "Home", link: "/" },
-          { text: "Format", link: "/format" },
-          { text: "Packages", link: "/packages" },
-          { text: "Playground", link: "/playground" }
+          { text: "Specification", link: "/spec" },
+          { text: "Packages", link: "/packages" }
         ]
       }
     ],
