@@ -1,0 +1,197 @@
+<script setup lang="ts">
+import PackageTreeDemo from "./PackageTreeDemo.vue";
+
+const readingLayers = [
+  {
+    title: "Package structure",
+    body: "AIX keeps the package readable as a tree of concrete entries instead of collapsing everything into an opaque blob."
+  },
+  {
+    title: "Page metadata",
+    body: "App and page config files define navigable surfaces and carry the context needed to interpret the package."
+  },
+  {
+    title: "Schema to tools",
+    body: "Schema-bearing pages can be promoted into tool-facing contracts without losing the link back to the package."
+  }
+];
+
+const readingFlow = [
+  {
+    step: "01",
+    title: "Open the archive",
+    body: "Readers start with the package boundary and enumerate entries such as `VERSION`, `app.json`, page files, and assets."
+  },
+  {
+    step: "02",
+    title: "Resolve pages",
+    body: "Page config and single-file components are interpreted into page summaries, descriptions, and layout hints."
+  },
+  {
+    step: "03",
+    title: "Interpret schema",
+    body: "Schema data adds explicit contracts to those pages so the package becomes more than a file container."
+  },
+  {
+    step: "04",
+    title: "Derive tools",
+    body: "Tool descriptions can then be generated from the same package-native structure rather than reconstructed elsewhere."
+  }
+];
+
+const packageSections = [
+  {
+    kicker: "Core package",
+    title: "AIX Format Core",
+    definition:
+      "The `aix` crate defines the AIX format itself. It provides the package reading model, page analysis logic, and the structural semantics that every other tool in the repository builds on.",
+    usage:
+      "Use it when you need the canonical library surface for reading `.aix` packages, resolving page metadata, or deriving format-native structures in Rust.",
+    command: "cargo test -p aix",
+    meta: [
+      { label: "Crate", value: "crates/aix" },
+      { label: "Provides", value: "Format definition, package reader, page analysis" },
+      { label: "Depends on", value: "Workspace foundation only" }
+    ]
+  },
+  {
+    kicker: "CLI package",
+    title: "Command-Line Workflows",
+    definition:
+      "The `aix-cli` crate turns the format model into terminal workflows. It is the command-line entry point for packaging, validating, and inspecting `.aix` artifacts.",
+    usage:
+      "Use it when you want to work with AIX from automation scripts, local development, or release pipelines without embedding the format library directly.",
+    command: "cargo run -p aix-cli -- --help",
+    meta: [
+      { label: "Crate", value: "crates/aix-cli" },
+      { label: "Provides", value: "Inspect, package, validate, CLI workflows" },
+      { label: "Depends on", value: "aix" }
+    ]
+  },
+  {
+    kicker: "Web package",
+    title: "Browser Format Tooling",
+    definition:
+      "The `aix-web` crate makes the same format capabilities available in the browser. It exposes AIX through WASM bindings and supports interactive inspection surfaces such as the Package Lab.",
+    usage:
+      "Use it when AIX needs to be explored, demonstrated, or integrated into web-based environments without leaving the format model behind.",
+    command: "cargo check -p aix-web --target wasm32-unknown-unknown",
+    meta: [
+      { label: "Crate", value: "crates/aix-web" },
+      { label: "Provides", value: "WASM bindings, browser inspection, web tooling" },
+      { label: "Depends on", value: "aix plus web bindings" }
+    ]
+  }
+];
+</script>
+
+<template>
+  <main class="aix-doc-home">
+    <section class="aix-doc-hero">
+      <div class="aix-doc-container aix-doc-hero-grid">
+        <div class="aix-doc-hero-copy">
+          <p class="aix-doc-kicker">AIX file format</p>
+          <h1 class="aix-doc-hero-title">
+            AIX is a readable package format for page structure, schema-defined inputs, and derived
+            tool surfaces.
+          </h1>
+          <p class="aix-doc-hero-lead">
+            Instead of treating the packaged artifact as an opaque archive, AIX keeps enough
+            structure for readers to inspect the package tree, interpret page metadata, and map
+            schema-bearing surfaces into tool contracts.
+          </p>
+          <div class="aix-doc-hero-actions">
+            <a class="aix-doc-button aix-doc-button-dark" href="/aix/format">Read the format</a>
+            <a class="aix-doc-button aix-doc-button-light" href="/aix/playground/">Open Package Lab</a>
+          </div>
+        </div>
+
+        <PackageTreeDemo />
+      </div>
+    </section>
+
+    <section class="aix-doc-section">
+      <div class="aix-doc-container">
+        <div class="aix-doc-section-head">
+          <p class="aix-doc-kicker">Reading model</p>
+          <h2>Three layers explain why AIX behaves like a format, not only an archive.</h2>
+          <p>
+            The homepage should immediately tell readers what the package contains, how those files
+            define pages, and how schema expands that structure into runtime-facing surfaces.
+          </p>
+        </div>
+
+        <div class="aix-doc-grid aix-doc-grid-3">
+          <article v-for="item in readingLayers" :key="item.title" class="aix-doc-card">
+            <h3>{{ item.title }}</h3>
+            <p>{{ item.body }}</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="aix-doc-section aix-doc-section-compact">
+      <div class="aix-doc-container">
+        <div class="aix-doc-section-head">
+          <p class="aix-doc-kicker">How readers interpret AIX</p>
+          <h2>The model expands in a predictable technical sequence.</h2>
+        </div>
+
+        <div class="aix-doc-flow">
+          <article v-for="item in readingFlow" :key="item.step" class="aix-doc-step">
+            <span class="aix-doc-step-number">{{ item.step }}</span>
+            <div>
+              <h3>{{ item.title }}</h3>
+              <p>{{ item.body }}</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section v-for="pkg in packageSections" :key="pkg.title" class="aix-doc-section aix-doc-package-section">
+      <div class="aix-doc-container">
+        <div class="aix-doc-package-grid">
+          <div class="aix-doc-section-head aix-doc-package-copy">
+            <p class="aix-doc-kicker">{{ pkg.kicker }}</p>
+            <h2>{{ pkg.title }}</h2>
+            <div class="aix-doc-prose">
+              <p>{{ pkg.definition }}</p>
+              <p>{{ pkg.usage }}</p>
+            </div>
+            <div class="aix-doc-command-wrap">
+              <span class="aix-doc-command-label">Quick command</span>
+              <pre class="aix-doc-command"><code>{{ pkg.command }}</code></pre>
+            </div>
+          </div>
+
+          <aside class="aix-doc-package-meta" aria-label="Package metadata">
+            <dl class="aix-doc-package-meta-list">
+              <div v-for="item in pkg.meta" :key="item.label" class="aix-doc-package-meta-row">
+                <dt>{{ item.label }}</dt>
+                <dd>{{ item.value }}</dd>
+              </div>
+            </dl>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="aix-doc-section aix-doc-final">
+      <div class="aix-doc-container aix-doc-final-grid">
+        <div>
+          <p class="aix-doc-kicker">Next step</p>
+          <h2>Read the specification, then validate a real artifact.</h2>
+          <p>
+            The docs define how the format works. The Package Lab lets you inspect a real `.aix`
+            artifact through the same conceptual model.
+          </p>
+        </div>
+        <div class="aix-doc-hero-actions">
+          <a class="aix-doc-button aix-doc-button-dark" href="/aix/packages">Explore packages</a>
+          <a class="aix-doc-button aix-doc-button-light" href="/aix/playground/">Launch Package Lab</a>
+        </div>
+      </div>
+    </section>
+  </main>
+</template>

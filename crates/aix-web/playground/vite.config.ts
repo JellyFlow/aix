@@ -6,9 +6,11 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const base = process.env.VITE_BASE_PATH ?? '/';
 
 export default defineConfig({
   root: '.',
+  base,
   plugins: [react(), wasm(), topLevelAwait()],
   resolve: {
     alias: {

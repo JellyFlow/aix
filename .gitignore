@@ -6,6 +6,9 @@
 /crates/aix-web/dist/
 /crates/aix-web/pkg/
 /crates/aix-web/playground/dist/
+/docs/node_modules/
+/docs/.vitepress/dist/
+/docs/.vitepress/cache/
 
 # Generated package outputs
 *.aix
