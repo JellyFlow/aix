@@ -1,7 +1,15 @@
 [package]
 name = "aix"
-version = "0.1.0"
+version = "0.7.0"
 edition = "2021"
+description = "Core Rust library for reading and analyzing AIX packages for AI agents"
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/jsar-project/aix"
+homepage = "https://jsar-project.github.io/aix/"
+documentation = "https://jsar-project.github.io/aix/spec"
+keywords = ["aix", "ai", "agent", "package", "archive"]
+categories = ["encoding", "parser-implementations"]
 
 [lib]
 crate-type = ["lib", "cdylib"]

@@ -30,7 +30,7 @@ dependencies = [
 
 [[package]]
 name = "aix"
-version = "0.1.0"
+version = "0.7.0"
 dependencies = [
  "anyhow",
  "js-sys",
@@ -45,7 +45,7 @@ dependencies = [
 
 [[package]]
 name = "aix-cli"
-version = "0.1.0"
+version = "0.7.0"
 dependencies = [
  "aix",
  "anyhow",
@@ -64,7 +64,7 @@ dependencies = [
 
 [[package]]
 name = "aix-web"
-version = "0.6.0"
+version = "0.7.0"
 dependencies = [
  "aix",
  "anyhow",
