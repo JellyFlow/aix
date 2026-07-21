@@ -307,8 +307,24 @@ impl AixReader {
 }
 
 fn page_has_parameters(data_schema: &serde_json::Value) -> bool {
-    !data_schema.is_null()
-        && !matches!(data_schema, serde_json::Value::Object(map) if map.is_empty())
+    if data_schema.is_null() {
+        return false;
+    }
+
+    let Some(map) = data_schema.as_object() else {
+        return true;
+    };
+
+    if map.is_empty() {
+        return false;
+    }
+
+    let is_empty_object_schema = matches!(
+        map.get("type").and_then(serde_json::Value::as_str),
+        Some("object")
+    ) && matches!(map.get("properties"), Some(serde_json::Value::Object(properties)) if properties.is_empty());
+
+    !is_empty_object_schema
 }
 
 pub fn format_size(bytes: u64) -> String {
@@ -710,6 +726,76 @@ mod tests {
     #[test]
     fn test_aix_reader_first_page_without_parameters_only_blank() {
         let data = create_test_aix_empty_schema_first_page();
+        let reader = AixReader::new(data).unwrap();
+
+        let tools = reader.get_tools();
+        assert_eq!(tools.len(), 2);
+        assert_eq!(tools[0].target, ToolTarget::Blank);
+        assert_eq!(tools[0].function.name, "pages/home/index");
+        assert_eq!(tools[0].function.parameters, serde_json::json!({}));
+        assert_eq!(tools[1].target, ToolTarget::Current);
+        assert_eq!(tools[1].function.name, "pages/detail/index");
+    }
+
+    fn create_test_aix_empty_properties_schema_first_page() -> Vec<u8> {
+        let mut buf = Vec::new();
+        {
+            let mut zip = zip::ZipWriter::new(Cursor::new(&mut buf));
+            let options = FileOptions::default();
+
+            zip.start_file("app.json", options).unwrap();
+            zip.write_all(
+                br#"{
+                "pages": ["pages/home/index", "pages/detail/index"],
+                "window": { "navigationBarTitleText": "Empty Properties App" }
+            }"#,
+            )
+            .unwrap();
+
+            zip.start_file("pages/home/index.json", options).unwrap();
+            zip.write_all(
+                br#"{
+                "navigationBarTitleText": "Home",
+                "description": "Home page",
+                "schema": {
+                    "data": {
+                        "type": "object",
+                        "properties": {},
+                        "required": []
+                    }
+                }
+            }"#,
+            )
+            .unwrap();
+            zip.start_file("pages/home/index.wxml", options).unwrap();
+            zip.write_all(br#"<view class="home"></view>"#).unwrap();
+            zip.start_file("pages/home/index.wxss", options).unwrap();
+            zip.write_all(br#".home { width: 200px; height: 100px; }"#)
+                .unwrap();
+
+            zip.start_file("pages/detail/index.json", options).unwrap();
+            zip.write_all(
+                br#"{
+                "navigationBarTitleText": "Detail",
+                "description": "Detail page",
+                "schema": { "data": { "type": "object", "properties": { "id": { "type": "string" } } } }
+            }"#,
+            )
+            .unwrap();
+            zip.start_file("pages/detail/index.wxml", options).unwrap();
+            zip.write_all(br#"<view class="detail"></view>"#).unwrap();
+            zip.start_file("pages/detail/index.wxss", options).unwrap();
+            zip.write_all(br#".detail { width: 300px; height: 150px; }"#)
+                .unwrap();
+
+            zip.finish().unwrap();
+        }
+        buf
+    }
+
+    #[test]
+    fn test_aix_reader_first_page_empty_properties_schema_is_blank() {
+        let data = create_test_aix_empty_properties_schema_first_page();
         let reader = AixReader::new(data).unwrap();
 
         let tools = reader.get_tools();

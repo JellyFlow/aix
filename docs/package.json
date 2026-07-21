@@ -4,8 +4,10 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vitepress dev .",
-    "build": "vitepress build .",
+    "build:aix-web": "npm --prefix ../crates/aix-web run build",
+    "docs": "npm run build:aix-web && vitepress dev .",
+    "dev": "npm run docs",
+    "build": "npm run build:aix-web && vitepress build .",
     "preview": "vitepress preview ."
   },
   "devDependencies": {
