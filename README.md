@@ -115,11 +115,11 @@ fn main() -> anyhow::Result<()> {
 ### Package Or Inspect With The CLI
 
 ```bash
-cargo run -p aix-cli -- pack ./my-agent -o bundle.aix
+cargo run -p aiui-aix-cli -- pack ./my-agent -o bundle.aix
 ```
 
 ```bash
-cargo run -p aix-cli -- list ./bundle.aix
+cargo run -p aiui-aix-cli -- list ./bundle.aix
 ```
 
 ### Read AIX In The Browser
@@ -156,8 +156,8 @@ npm run dev
 Validate the workspace from the repository root:
 
 ```bash
-cargo test -p aix -p aix-cli
-cargo check -p aix-web --target wasm32-unknown-unknown
+cargo test -p aiui-aix -p aiui-aix-cli
+cargo check -p aiui-aix-web --target wasm32-unknown-unknown
 ```
 
 Build the web package outputs:

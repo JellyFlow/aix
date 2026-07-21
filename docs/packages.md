@@ -38,8 +38,8 @@ It makes the format readable inside interactive interfaces, including the offici
 Typical validation flow:
 
 ```bash
-cargo test -p aix -p aix-cli
-cargo check -p aix-web --target wasm32-unknown-unknown
+cargo test -p aiui-aix -p aiui-aix-cli
+cargo check -p aiui-aix-web --target wasm32-unknown-unknown
 ```
 
 ## Relationship To The Website

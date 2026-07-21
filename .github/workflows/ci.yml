@@ -33,7 +33,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Run native unit tests
-        run: cargo test -p aix -p aix-cli
+        run: cargo test -p aiui-aix -p aiui-aix-cli
 
   wasm-check:
     name: WASM Check
@@ -52,4 +52,4 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Check WASM target
-        run: cargo check -p aix-web --target wasm32-unknown-unknown
+        run: cargo check -p aiui-aix-web --target wasm32-unknown-unknown

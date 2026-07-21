@@ -1,5 +1,5 @@
 [package]
-name = "aix"
+name = "aiui-aix"
 version = "0.7.0"
 edition = "2021"
 description = "Core Rust library for reading and analyzing AIX packages for AI agents"

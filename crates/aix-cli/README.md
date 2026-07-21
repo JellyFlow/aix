@@ -7,10 +7,16 @@ AIX CLI is a command-line utility for managing Ink AIX packages. It provides cap
 You can build and install it locally using Cargo:
 
 ```bash
-cargo install --path packages/aix-cli
+cargo install --path crates/aix-cli
 ```
 
 Once installed, the `aix` command will be available in your shell.
+
+If you want to install the published crate from crates.io:
+
+```bash
+cargo install aiui-aix-cli
+```
 
 ## Core Features
 
@@ -64,7 +70,7 @@ aix ls <AIX_FILE>
 If you are at the project root, you can run the CLI directly using:
 
 ```bash
-cargo run -p aix-cli -- pack fixtures/agents/capabilities -o test.aix
+cargo run -p aiui-aix-cli -- pack fixtures/agents/capabilities -o test.aix
 ```
 
 ## License

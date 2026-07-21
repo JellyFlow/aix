@@ -9,8 +9,8 @@ on:
         default: all
         type: choice
         options:
-          - aix
-          - aix-cli
+          - aiui-aix
+          - aiui-aix-cli
           - all
       dry_run:
         description: Run cargo publish --dry-run instead of publishing
@@ -40,7 +40,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Run baseline tests
-        run: cargo test -p aix -p aix-cli
+        run: cargo test -p aiui-aix -p aiui-aix-cli
 
       - name: Ensure crates.io token is configured
         if: ${{ !inputs.dry_run }}
@@ -52,32 +52,32 @@ jobs:
             exit 1
           fi
 
-      - name: Dry run publish aix
-        if: ${{ inputs.crate == 'aix' || inputs.crate == 'all' }}
+      - name: Dry run publish aiui-aix
+        if: ${{ inputs.crate == 'aiui-aix' || inputs.crate == 'all' }}
         run: |
           if [ "${{ inputs.dry_run }}" = "true" ]; then
-            cargo publish -p aix --dry-run
+            cargo publish -p aiui-aix --dry-run
           fi
 
-      - name: Preview aix-cli package contents
-        if: ${{ inputs.crate == 'aix-cli' || inputs.crate == 'all' }}
+      - name: Preview aiui-aix-cli package contents
+        if: ${{ inputs.crate == 'aiui-aix-cli' || inputs.crate == 'all' }}
         run: |
           if [ "${{ inputs.dry_run }}" = "true" ]; then
-            cargo package -p aix-cli --list
+            cargo package -p aiui-aix-cli --list
           fi
 
-      - name: Publish aix
-        if: ${{ (inputs.crate == 'aix' || inputs.crate == 'all') && !inputs.dry_run }}
+      - name: Publish aiui-aix
+        if: ${{ (inputs.crate == 'aiui-aix' || inputs.crate == 'all') && !inputs.dry_run }}
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-        run: cargo publish -p aix
+        run: cargo publish -p aiui-aix
 
       - name: Wait for crates.io index propagation
         if: ${{ inputs.crate == 'all' && !inputs.dry_run }}
         run: sleep 30
 
-      - name: Publish aix-cli
-        if: ${{ (inputs.crate == 'aix-cli' || inputs.crate == 'all') && !inputs.dry_run }}
+      - name: Publish aiui-aix-cli
+        if: ${{ (inputs.crate == 'aiui-aix-cli' || inputs.crate == 'all') && !inputs.dry_run }}
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-        run: cargo publish -p aix-cli
+        run: cargo publish -p aiui-aix-cli

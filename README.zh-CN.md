@@ -115,11 +115,11 @@ fn main() -> anyhow::Result<()> {
 ### 用 CLI 打包或检查
 
 ```bash
-cargo run -p aix-cli -- pack ./my-agent -o bundle.aix
+cargo run -p aiui-aix-cli -- pack ./my-agent -o bundle.aix
 ```
 
 ```bash
-cargo run -p aix-cli -- list ./bundle.aix
+cargo run -p aiui-aix-cli -- list ./bundle.aix
 ```
 
 ### 在浏览器中读取 AIX
@@ -156,8 +156,8 @@ npm run dev
 在仓库根目录进行基础校验：
 
 ```bash
-cargo test -p aix -p aix-cli
-cargo check -p aix-web --target wasm32-unknown-unknown
+cargo test -p aiui-aix -p aiui-aix-cli
+cargo check -p aiui-aix-web --target wasm32-unknown-unknown
 ```
 
 构建 Web 包输出：

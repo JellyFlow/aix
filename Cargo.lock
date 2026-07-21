@@ -29,7 +29,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "aix"
+name = "aiui-aix"
 version = "0.7.0"
 dependencies = [
  "anyhow",
@@ -44,10 +44,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "aix-cli"
+name = "aiui-aix-cli"
 version = "0.7.0"
 dependencies = [
- "aix",
+ "aiui-aix",
  "anyhow",
  "chardetng",
  "clap",
@@ -63,10 +63,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "aix-web"
+name = "aiui-aix-web"
 version = "0.7.0"
 dependencies = [
- "aix",
+ "aiui-aix",
  "anyhow",
  "js-sys",
  "serde",
