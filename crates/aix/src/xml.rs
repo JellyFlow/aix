@@ -63,12 +63,10 @@ pub fn parse_xml(content: &str) -> Result<Vec<Node>, String> {
                 let name = String::from_utf8_lossy(e.name().as_ref()).to_string();
                 let mut attributes = HashMap::new();
 
-                for attr in e.html_attributes() {
-                    if let Ok(a) = attr {
-                        let key = String::from_utf8_lossy(a.key.as_ref()).to_string();
-                        let value = String::from_utf8_lossy(&a.value).to_string();
-                        attributes.insert(key, value);
-                    }
+                for a in e.html_attributes().flatten() {
+                    let key = String::from_utf8_lossy(a.key.as_ref()).to_string();
+                    let value = String::from_utf8_lossy(&a.value).to_string();
+                    attributes.insert(key, value);
                 }
 
                 stack.push(Node::Element {
@@ -81,12 +79,10 @@ pub fn parse_xml(content: &str) -> Result<Vec<Node>, String> {
                 let name = String::from_utf8_lossy(e.name().as_ref()).to_string();
                 let mut attributes = HashMap::new();
 
-                for attr in e.html_attributes() {
-                    if let Ok(a) = attr {
-                        let key = String::from_utf8_lossy(a.key.as_ref()).to_string();
-                        let value = String::from_utf8_lossy(&a.value).to_string();
-                        attributes.insert(key, value);
-                    }
+                for a in e.html_attributes().flatten() {
+                    let key = String::from_utf8_lossy(a.key.as_ref()).to_string();
+                    let value = String::from_utf8_lossy(&a.value).to_string();
+                    attributes.insert(key, value);
                 }
 
                 let node = Node::Element {

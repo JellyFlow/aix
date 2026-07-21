@@ -11,6 +11,23 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust artifacts
+        uses: Swatinem/rust-cache@v2
+
+      - name: Run Clippy
+        run: cargo clippy --workspace --all-targets -- -D warnings
+
   native-tests:
     name: Native Tests (${{ matrix.os }})
     runs-on: ${{ matrix.os }}

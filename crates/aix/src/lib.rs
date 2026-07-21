@@ -311,6 +311,22 @@ fn page_has_parameters(data_schema: &serde_json::Value) -> bool {
         && !matches!(data_schema, serde_json::Value::Object(map) if map.is_empty())
 }
 
+pub fn format_size(bytes: u64) -> String {
+    const KB: u64 = 1024;
+    const MB: u64 = KB * 1024;
+    const GB: u64 = MB * 1024;
+
+    if bytes >= GB {
+        format!("{:.2} GB", bytes as f64 / GB as f64)
+    } else if bytes >= MB {
+        format!("{:.2} MB", bytes as f64 / MB as f64)
+    } else if bytes >= KB {
+        format!("{:.2} KB", bytes as f64 / KB as f64)
+    } else {
+        format!("{} bytes", bytes)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -753,21 +769,5 @@ mod tests {
         assert_eq!(pages[0].title, Some("Inline Style Page".to_string()));
         assert_eq!(pages[0].size.width, 400.0);
         assert_eq!(pages[0].size.height, 180.0);
-    }
-}
-
-pub fn format_size(bytes: u64) -> String {
-    const KB: u64 = 1024;
-    const MB: u64 = KB * 1024;
-    const GB: u64 = MB * 1024;
-
-    if bytes >= GB {
-        format!("{:.2} GB", bytes as f64 / GB as f64)
-    } else if bytes >= MB {
-        format!("{:.2} MB", bytes as f64 / MB as f64)
-    } else if bytes >= KB {
-        format!("{:.2} KB", bytes as f64 / KB as f64)
-    } else {
-        format!("{} bytes", bytes)
     }
 }
