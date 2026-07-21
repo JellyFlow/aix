@@ -3,6 +3,14 @@ name: Publish Crates
 on:
   workflow_dispatch:
     inputs:
+      channel:
+        description: Release channel
+        required: true
+        default: daily
+        type: choice
+        options:
+          - daily
+          - release
       crate:
         description: Crate to publish
         required: true
@@ -38,6 +46,22 @@ jobs:
 
       - name: Cache Rust artifacts
         uses: Swatinem/rust-cache@v2
+
+      - name: Prepare daily crate versions
+        if: ${{ inputs.channel == 'daily' }}
+        shell: bash
+        run: |
+          BASE_VERSION=$(grep -m1 '^version = "' crates/aix/Cargo.toml | sed -E 's/version = "([^"]+)"/\1/')
+          DAILY_DATE=$(date -u +%Y%m%d)
+          DAILY_VERSION="${BASE_VERSION}-daily.${DAILY_DATE}"
+
+          echo "Preparing daily versions from ${BASE_VERSION} to ${DAILY_VERSION}"
+
+          perl -0pi -e 's/^version = "\K[^"]+/'"${DAILY_VERSION}"'/m' crates/aix/Cargo.toml
+          perl -0pi -e 's/^version = "\K[^"]+/'"${DAILY_VERSION}"'/m' crates/aix-cli/Cargo.toml
+          perl -0pi -e 's/(package = "aiui-aix", path = "\.\.\/aix", version = ")[^"]+/\1'"${DAILY_VERSION}"'/' crates/aix-cli/Cargo.toml
+
+          echo "Resolved daily version: ${DAILY_VERSION}"
 
       - name: Run baseline tests
         run: cargo test -p aiui-aix -p aiui-aix-cli
