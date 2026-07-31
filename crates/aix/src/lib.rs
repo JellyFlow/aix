@@ -4,7 +4,11 @@ extern crate alloc;
 
 use alloc::{format, string::String, string::ToString, vec::Vec};
 use anyhow::{anyhow, Result};
+#[cfg(not(feature = "std"))]
+use hashbrown::HashSet;
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "std")]
+use std::collections::HashSet;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -23,6 +27,7 @@ fn aix_warn(msg: &str) {
 use rawzip::{CompressionMethod, ZipArchive};
 
 pub mod analyzer;
+pub mod crypto;
 pub mod xml;
 pub use analyzer::{PageAnalyzer, PageConstraint};
 
@@ -175,6 +180,108 @@ impl AixReader {
         self.read_file("VERSION")
             .ok()
             .and_then(|v| String::from_utf8(v).ok())
+    }
+
+    /// Reads the package manifest. Older packages may not contain one.
+    pub fn get_manifest(&self) -> Result<Option<crypto::PackageManifest>> {
+        if !self
+            .entries
+            .iter()
+            .any(|entry| entry.name == crypto::MANIFEST_PATH)
+        {
+            return Ok(None);
+        }
+
+        let data = self.read_file(crypto::MANIFEST_PATH)?;
+        serde_json::from_slice(&data)
+            .map(Some)
+            .map_err(|error| anyhow!("Invalid AIX manifest: {}", error))
+    }
+
+    /// Returns whether this package supports the supplied engine version.
+    pub fn supports_engine(&self, current_version: &str) -> Result<bool> {
+        let manifest = self
+            .get_manifest()?
+            .ok_or_else(|| anyhow!("AIX manifest not found"))?;
+        crypto::engine_satisfies(&manifest.engine, current_version)
+            .map_err(|error| anyhow!("Invalid engine version or range: {}", error))
+    }
+
+    /// Verifies the manifest signature and every package entry against a trusted key.
+    pub fn verify_signature(
+        &self,
+        trusted_key: &crypto::PublicKey,
+    ) -> Result<crypto::VerificationReport> {
+        let manifest_data = self.read_file(crypto::MANIFEST_PATH)?;
+        let manifest: crypto::PackageManifest = serde_json::from_slice(&manifest_data)
+            .map_err(|error| anyhow!("Invalid AIX manifest: {}", error))?;
+        if manifest.format != "aix"
+            || manifest.algorithm != "ed25519"
+            || manifest.digest != "sha256"
+        {
+            return Err(anyhow!("Unsupported AIX signature manifest"));
+        }
+        crypto::validate_engine_range(&manifest.engine)
+            .map_err(|error| anyhow!("Invalid engine range: {}", error))?;
+        if manifest.key_id != trusted_key.key_id() {
+            return Err(anyhow!("Manifest key ID does not match trusted key"));
+        }
+
+        let signature_data = self.read_file(crypto::SIGNATURE_PATH)?;
+        let signature_bytes: [u8; 64] = signature_data
+            .try_into()
+            .map_err(|_| anyhow!("Invalid Ed25519 signature length"))?;
+        let signature = crypto::Signature::from_bytes(signature_bytes);
+        trusted_key
+            .verify(b"package-manifest", &manifest_data, &signature)
+            .map_err(|error| anyhow!("AIX signature verification failed: {}", error))?;
+
+        let mut previous: Option<&str> = None;
+        for entry in &manifest.entries {
+            if previous.is_some_and(|path| path.as_bytes() >= entry.path.as_bytes())
+                || entry.path.starts_with("META-INF/aix/")
+            {
+                return Err(anyhow!(
+                    "Invalid or unsorted manifest entry: {}",
+                    entry.path
+                ));
+            }
+            let data = self.read_file(&entry.path)?;
+            if data.len() as u64 != entry.size || crypto::sha256(&data) != entry.sha256 {
+                return Err(anyhow!("Package entry digest mismatch: {}", entry.path));
+            }
+            previous = Some(&entry.path);
+        }
+        let signed_paths: HashSet<&str> = manifest
+            .entries
+            .iter()
+            .map(|entry| entry.path.as_str())
+            .collect();
+        for entry in &self.entries {
+            if entry.name.ends_with('/') || entry.name.starts_with(crypto::METADATA_PREFIX) {
+                continue;
+            }
+            if !signed_paths.contains(entry.name.as_str()) {
+                return Err(anyhow!("Unsigned package entry: {}", entry.name));
+            }
+        }
+        let version = self
+            .get_version()
+            .ok_or_else(|| anyhow!("VERSION entry not found"))?;
+        if manifest.version != version {
+            return Err(anyhow!("Manifest version does not match VERSION"));
+        }
+        if crypto::calculate_package_id(&manifest.entries) != manifest.package_id {
+            return Err(anyhow!("Manifest package ID mismatch"));
+        }
+
+        Ok(crypto::VerificationReport {
+            package_id: manifest.package_id,
+            version: manifest.version,
+            engine: manifest.engine,
+            key_id: manifest.key_id,
+            entry_count: manifest.entries.len(),
+        })
     }
 
     pub fn get_title(&self) -> Option<String> {
@@ -446,6 +553,34 @@ mod tests {
 
         let reader = AixReader::new(data).unwrap();
         assert_eq!(reader.read_file("app.json").unwrap(), br#"{"pages":[]}"#);
+    }
+
+    #[test]
+    fn missing_manifest_returns_none() {
+        let reader = AixReader::new(create_test_aix()).unwrap();
+        assert!(reader.get_manifest().unwrap().is_none());
+    }
+
+    #[test]
+    fn corrupt_manifest_propagates_read_error() {
+        let manifest = br#"{"format":"aix"}"#;
+        let mut data = Vec::new();
+        {
+            let mut zip = zip::ZipWriter::new(Cursor::new(&mut data));
+            let options = FileOptions::default().compression_method(zip::CompressionMethod::Stored);
+            zip.start_file(crypto::MANIFEST_PATH, options).unwrap();
+            zip.write_all(manifest).unwrap();
+            zip.finish().unwrap();
+        }
+        let offset = data
+            .windows(manifest.len())
+            .position(|window| window == manifest)
+            .unwrap();
+        data[offset] ^= 1;
+
+        let reader = AixReader::new(data).unwrap();
+        let error = reader.get_manifest().unwrap_err();
+        assert!(error.to_string().contains("Failed to verify"));
     }
 
     #[test]
