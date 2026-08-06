@@ -246,10 +246,11 @@ body {
   margin: 0 0 34px;
   border-top: 0;
   color: var(--aix-ink);
+  font-family: var(--vp-font-family-base);
   font-size: clamp(2rem, 4.2vw, 3rem);
   line-height: 1;
   letter-spacing: -0.055em;
-  font-weight: 620;
+  font-weight: 600;
   text-wrap: balance;
 }
 
