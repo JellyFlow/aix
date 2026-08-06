@@ -4,7 +4,7 @@ const { execSync, spawnSync } = require("child_process");
 
 const rootDir = path.resolve(__dirname, "..");
 const distDir = path.join(rootDir, "dist");
-const aixWebDir = path.resolve(rootDir, "../aix-web");
+const aixWebDir = path.resolve(rootDir, "../../crates/aix-web");
 const wasmOutDir = path.join(aixWebDir, "dist", "pkg-cli");
 const pkgDir = path.join(distDir, "pkg");
 

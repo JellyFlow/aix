@@ -6,13 +6,13 @@ It packages pages, schema, and tools into a distributable artifact that stays re
 
 ## What This Repository Contains
 
-This repository is a Rust workspace with these package-facing surfaces:
+This repository centers on a Rust workspace with these package-facing surfaces:
 
 - `crates/aix`: the `no_std + alloc` package reader, cryptography, signature verification, page analysis, and tool derivation layer
 - `crates/aix-pack`: the in-memory Native/WASM packaging and optimization layer
 - `crates/aix-cli`: the native Rust CLI (`aiui-aix-cli`), binary named `aix`
 - `crates/aix-web`: the WASM and TypeScript surface for browser-based AIX inspection and integration
-- `crates/aix-node-cli`: the npm-published CLI (`@yodaos-pkg/aix-cli`), a TypeScript shell over the same WASM engine
+- `packages/cli`: the npm-published CLI (`@yodaos-pkg/aix-cli`), a TypeScript shell over the same WASM engine
 - `docs`: the official documentation site, including `Specification`, `Packages`, and `Play`
 
 ## Workspace Layout
@@ -23,8 +23,9 @@ This repository is a Rust workspace with these package-facing surfaces:
 │   ├── aix/
 │   ├── aix-pack/
 │   ├── aix-cli/
-│   ├── aix-web/
-│   └── aix-node-cli/
+│   └── aix-web/
+├── packages/
+│   └── cli/
 ├── docs/
 ├── Cargo.toml
 └── README.md
@@ -69,14 +70,14 @@ shared by the CLI and Web/WASM package. Every newly packed artifact contains a
 manifest. Callers may optionally supply an Ed25519 private key to sign the final,
 optimized package contents.
 
-### `crates/aix-cli` and `crates/aix-node-cli`
+### `crates/aix-cli` and `packages/cli`
 
 Two CLI surfaces share the same packing engine and expose the identical `aix`
 command. Pick whichever install path suits you:
 
 - **Native (Rust):** `cargo install aiui-aix-cli` — compiled from `crates/aix-cli`.
 - **npm:** `npm install -g @yodaos-pkg/aix-cli` — a TypeScript shell from
-  `crates/aix-node-cli` over the Rust engine compiled to a Node.js WASM bundle.
+  `packages/cli` over the Rust engine compiled to a Node.js WASM bundle.
 
 It currently focuses on:
 

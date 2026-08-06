@@ -2,13 +2,13 @@
 
 Thanks for contributing to AIX.
 
-AIX is an executable package format for AI agents. This repository is a Rust workspace with these package-facing surfaces:
+AIX is an executable package format for AI agents. This repository centers on a Rust workspace with these package-facing surfaces:
 
 - `crates/aix`: core Rust library
 - `crates/aix-pack`: in-memory Native/WASM packer and optimizer
 - `crates/aix-cli`: native Rust CLI (`aiui-aix-cli`)
 - `crates/aix-web`: WASM and TypeScript package
-- `crates/aix-node-cli`: npm-published CLI (`@yodaos-pkg/aix-cli`)
+- `packages/cli`: npm-published CLI (`@yodaos-pkg/aix-cli`)
 - `docs`: the VitePress documentation site
 
 ## Before You Start
@@ -39,8 +39,9 @@ npm --version
 │   ├── aix/
 │   ├── aix-pack/
 │   ├── aix-cli/
-│   ├── aix-web/
-│   └── aix-node-cli/
+│   └── aix-web/
+├── packages/
+│   └── cli/
 ├── docs/
 ├── .github/workflows/
 ├── Cargo.toml
@@ -53,7 +54,7 @@ The workspace is intentionally split by surface area:
 - `aix-pack` owns in-memory packaging, normalization, and resource optimization
 - `aix-cli` is the native Rust command-line interface (binary `aix`)
 - `aix-web` exposes the same capabilities through WASM and TypeScript
-- `aix-node-cli` is the npm-published command-line interface (`@yodaos-pkg/aix-cli`, binary `aix`) — a TypeScript shell over the same engine
+- `packages/cli` is the npm-published command-line interface (`@yodaos-pkg/aix-cli`, binary `aix`) — a TypeScript shell over the same engine
 - `docs` is the official site for `Specification`, `Packages`, and `Play`
 
 ## Build From Source
@@ -113,7 +114,7 @@ When changing multiple surfaces, prefer validating them in this order:
 2. `crates/aix-pack`
 3. `crates/aix-cli`
 4. `crates/aix-web`
-5. `crates/aix-node-cli`
+5. `packages/cli`
 6. `docs`
 
 This keeps the core model stable before checking derived interfaces.
@@ -163,7 +164,7 @@ cargo check -p aiui-aix-web --target wasm32-unknown-unknown
 cd crates/aix-web && npm install && npm run build
 
 # npm CLI build and smoke test
-cd crates/aix-node-cli && npm install && npm run build && node dist/cli.js --help
+cd packages/cli && npm install && npm run build && node dist/cli.js --help
 
 # Docs site build
 cd docs && npm install && npm run build
@@ -220,12 +221,12 @@ cargo package -p aiui-aix-cli --list
 
 ### Publish the npm CLI package
 
-The npm CLI package lives under `crates/aix-node-cli` and is published as `@yodaos-pkg/aix-cli`.
+The npm CLI package lives under `packages/cli` and is published as `@yodaos-pkg/aix-cli`.
 
 Recommended process:
 
 ```bash
-cd crates/aix-node-cli
+cd packages/cli
 npm install
 npm run build
 npm pack --dry-run

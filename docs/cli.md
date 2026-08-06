@@ -139,7 +139,7 @@ During development, run either surface without installing it globally:
 
 ```bash
 # npm surface
-cd crates/aix-node-cli
+cd packages/cli
 npm install
 npm run build
 node dist/cli.js pack ./my-agent -o bundle.aix

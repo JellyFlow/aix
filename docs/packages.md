@@ -1,6 +1,6 @@
 # Packages
 
-The AIX repository is organized as a Rust workspace with these format-facing surfaces.
+The AIX repository centers on a Rust workspace with these format-facing surfaces.
 
 ## `crates/aix`
 
@@ -35,7 +35,7 @@ It turns the format into developer workflows such as:
 - validating and normalizing packaged assets
 - listing package contents
 
-## `crates/aix-node-cli`
+## `packages/cli`
 
 The npm-published CLI (`@yodaos-pkg/aix-cli`) is the packaging and inspection
 surface, installed with `npm install -g @yodaos-pkg/aix-cli`. It is a thin

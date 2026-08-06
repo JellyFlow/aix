@@ -12,7 +12,7 @@ The directory name, Cargo package name, and npm package name all differ. Use the
 | `crates/aix-pack` | `aiui-aix-pack` | In-memory packer/optimizer (no filesystem). Shared by native CLI, WASM + npm CLI. |
 | `crates/aix-web` | `aiui-aix-web` | WASM + TypeScript surface. npm package `@yodaos-pkg/aix`. |
 | `crates/aix-cli` | `aiui-aix-cli` | Native Rust CLI, binary named `aix`. Install via `cargo install aiui-aix-cli`. |
-| `crates/aix-node-cli` | — | npm CLI `@yodaos-pkg/aix-cli`. TS shell over the same WASM engine. Install via `npm install -g @yodaos-pkg/aix-cli`. |
+| `packages/cli` | — | npm CLI `@yodaos-pkg/aix-cli`. TS shell over the same WASM engine. Install via `npm install -g @yodaos-pkg/aix-cli`. |
 | `docs/` | — | VitePress site (`/spec`, `/cli`, `/packages`, `/play`). |
 
 All four crates are versioned `0.7.0`. Dependencies embed both `path` and `version`, so bump versions across `crates/*/Cargo.toml` together.
@@ -22,12 +22,12 @@ All four crates are versioned `0.7.0`. Dependencies embed both `path` and `versi
 The `aix` command can be installed two ways; pick one. Both share the same packing engine and behave identically:
 
 - Native Rust binary: `cargo install aiui-aix-cli` (compiled from `crates/aix-cli`).
-- npm package: `npm install -g @yodaos-pkg/aix-cli` (compiled from `crates/aix-node-cli`, a TypeScript shell over the Rust engine built to a Node.js WASM bundle).
+- npm package: `npm install -g @yodaos-pkg/aix-cli` (compiled from `packages/cli`, a TypeScript shell over the Rust engine built to a Node.js WASM bundle).
 
-## npm CLI (`crates/aix-node-cli`)
+## npm CLI (`packages/cli`)
 
 ```bash
-cd crates/aix-node-cli && npm install && npm run build
+cd packages/cli && npm install && npm run build
 ```
 
 - `npm run build` runs `wasm-pack build --target nodejs` (from `crates/aix-web`) then bundles `src/cli.ts` with esbuild into `dist/cli.js`, copying the WASM artifact to `dist/pkg/`.
@@ -50,7 +50,7 @@ cargo check -p aiui-aix --no-default-features
 - CI runs `cargo test -p aiui-aix -p aiui-aix-cli` on native, plus a wasm check and an npm CLI build job. `aiui-aix-pack` has its own unit tests but CI does **not** run them — run `cargo test -p aiui-aix-pack` yourself when you touch it.
 - WASM checks require `cargo` with the `wasm32-unknown-unknown` target installed: `rustup target add wasm32-unknown-unknown`.
 - Evaluating a full WASM build requires `wasm-pack`: `cd crates/aix-web && npm install && npm run build` (outputs to `crates/aix-web/dist`).
-- Building the npm CLI requires the same toolchain (rustup + wasm32 target + wasm-pack): `cd crates/aix-node-cli && npm install && npm run build`. The build script first tries `wasm-pack --no-opt` to avoid binaryen downloads, then falls back automatically when that flag is unsupported by the installed `wasm-pack`.
+- Building the npm CLI requires the same toolchain (rustup + wasm32 target + wasm-pack): `cd packages/cli && npm install && npm run build`. The build script first tries `wasm-pack --no-opt` to avoid binaryen downloads, then falls back automatically when that flag is unsupported by the installed `wasm-pack`.
 
 ## Docs site (VitePress)
 
@@ -90,7 +90,7 @@ cd docs && npm install && npm run dev
 
 ## CLI behavior
 
-- `aix pack <INPUT_DIR>` auto-generates a UUID v4 as the build id / `VERSION`; rejects input named `VERSION`. Native (`crates/aix-cli`) and npm (`crates/aix-node-cli`) surfaces are behavior-identical.
+- `aix pack <INPUT_DIR>` auto-generates a UUID v4 as the build id / `VERSION`; rejects input named `VERSION`. Native (`crates/aix-cli`) and npm (`packages/cli`) surfaces are behavior-identical.
 - Packing validates all `.json`; converts non-UTF-8 `.json`/`.js`/`.ink` (UTF-16/GB18030/detected) to UTF-8; binary PNG/JPEG may be compressed per `--opt-level` (1-3).
 - `.aixignore` uses `.gitignore` syntax and is honored when packing (rule file itself is excluded). There is no `.aixignore` in this repo — README examples referencing a `fixtures/` directory are **stale** (no `fixtures/` exists).
 

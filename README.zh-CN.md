@@ -6,13 +6,13 @@ AIX 是一种面向 AI agents 的可执行包格式。
 
 ## 仓库包含什么
 
-这个仓库是一个 Rust workspace，包含多层面向格式本身的实现：
+这个仓库以 Rust workspace 为核心，包含多层面向格式本身的实现：
 
 - `crates/aix`：支持 `no_std + alloc` 的包读取、页面分析和 tool 推导核心
 - `crates/aix-pack`：面向 Native 和 Web/WASM 的纯内存打包与资源优化能力
 - `crates/aix-cli`：原生 Rust 命令行入口（`aiui-aix-cli`），二进制名 `aix`
 - `crates/aix-web`：面向浏览器的 WASM 和 TypeScript 接口
-- `crates/aix-node-cli`：通过 npm 发布的命令行入口（`@yodaos-pkg/aix-cli`），基于同一 WASM 引擎的 TypeScript 壳
+- `packages/cli`：通过 npm 发布的命令行入口（`@yodaos-pkg/aix-cli`），基于同一 WASM 引擎的 TypeScript 壳
 - `docs`：官方文档站，包含 `Specification`、`Packages` 和 `Play`
 
 ## Workspace 结构
@@ -23,8 +23,9 @@ AIX 是一种面向 AI agents 的可执行包格式。
 │   ├── aix/
 │   ├── aix-pack/
 │   ├── aix-cli/
-│   ├── aix-web/
-│   └── aix-node-cli/
+│   └── aix-web/
+├── packages/
+│   └── cli/
 ├── docs/
 ├── Cargo.toml
 └── README.zh-CN.md
@@ -61,12 +62,12 @@ AIX 是一种面向 AI agents 的可执行包格式。
 
 `aix-pack` 完全在内存中构建和优化 `.aix`，负责文本规范化、JSON 紧凑化以及使用纯 Rust 编解码器优化 PNG/JPEG，并由 CLI 和 Web/WASM 共同使用。
 
-### `crates/aix-cli` 与 `crates/aix-node-cli`
+### `crates/aix-cli` 与 `packages/cli`
 
 两个 CLI 表面共享同一打包引擎，提供完全一致的 `aix` 命令，按需选择安装方式：
 
 - **原生（Rust）**：`cargo install aiui-aix-cli`（源码在 `crates/aix-cli`）
-- **npm**：`npm install -g @yodaos-pkg/aix-cli`（源码在 `crates/aix-node-cli`，是把 Rust 引擎编译成 Node.js WASM 包的 TypeScript 壳）
+- **npm**：`npm install -g @yodaos-pkg/aix-cli`（源码在 `packages/cli`，是把 Rust 引擎编译成 Node.js WASM 包的 TypeScript 壳）
 
 CLI 把格式能力转成终端工作流，目前主要包括：
 
