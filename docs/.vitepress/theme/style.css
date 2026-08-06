@@ -185,6 +185,17 @@ body {
   padding: 112px 0 52px;
 }
 
+.aix-doc-install-section {
+  padding: 28px 0 36px;
+  border-top: 0;
+}
+
+.aix-doc-install-shell {
+  max-width: 680px;
+  margin: 0 auto;
+  border-top: 0;
+}
+
 .aix-doc-hero-grid {
   display: grid;
   grid-template-columns: minmax(0, 0.9fr) minmax(420px, 1.1fr);
@@ -218,6 +229,140 @@ body {
   flex-wrap: wrap;
   gap: 12px;
   margin-top: 28px;
+}
+
+.aix-doc-install {
+  display: grid;
+  justify-items: center;
+  width: 100%;
+  margin: 160px 0 80px;
+  padding: 0;
+  background: transparent;
+  text-align: center;
+}
+
+.vp-doc p.aix-doc-install-title {
+  max-width: 840px;
+  margin: 0 0 34px;
+  border-top: 0;
+  color: var(--aix-ink);
+  font-size: clamp(2rem, 4.2vw, 3rem);
+  line-height: 1;
+  letter-spacing: -0.055em;
+  font-weight: 620;
+  text-wrap: balance;
+}
+
+.aix-doc-install-tabs {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgba(23, 29, 40, 0.05);
+  overflow: hidden;
+}
+
+.aix-doc-install-tab-indicator {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 2px 8px rgba(31, 39, 53, 0.06);
+  transition:
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    width 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.aix-doc-install-tab {
+  position: relative;
+  z-index: 1;
+  min-height: 34px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--aix-muted);
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.aix-doc-install-tab:hover {
+  color: var(--aix-ink);
+}
+
+.aix-doc-install-tab:active {
+  transform: translateY(1px);
+}
+
+.aix-doc-install-tab.is-active {
+  color: var(--aix-ink);
+}
+
+.aix-doc-install-command-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.aix-doc-install-command {
+  margin: 0;
+  overflow-x: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--aix-ink);
+  font-family: var(--vp-font-family-mono);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.aix-doc-install-command code {
+  color: inherit;
+  font-family: var(--vp-font-family-mono);
+  white-space: pre;
+  letter-spacing: -0.01em;
+}
+
+.aix-doc-install-copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(23, 29, 40, 0.05);
+  color: var(--aix-muted);
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.aix-doc-install-copy:hover {
+  background: rgba(23, 29, 40, 0.09);
+  color: var(--aix-ink);
+}
+
+.aix-doc-install-copy:active {
+  transform: translateY(1px);
+}
+
+.aix-doc-install-copy-icon {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
 }
 
 .aix-doc-button {
@@ -2015,6 +2160,24 @@ body {
 
   .aix-doc-hero-title {
     font-size: clamp(2.4rem, 12vw, 4rem);
+  }
+
+  .aix-doc-install {
+    padding: 12px;
+    margin: 112px 0 56px;
+  }
+
+  .aix-doc-install-section {
+    padding: 20px 0 28px;
+  }
+
+  .aix-doc-install-tabs {
+    display: flex;
+  }
+
+  .aix-doc-install-command-row {
+    flex-wrap: wrap;
+    justify-content: center;
   }
 
   .aix-tree-header {

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed, ref } from "vue";
 import { withBase } from "vitepress";
 import PackageTreeDemo from "./PackageTreeDemo.vue";
 
@@ -85,6 +86,56 @@ const packageSections = [
   }
 ];
 
+const installOptions = [
+  {
+    id: "npm",
+    label: "npm",
+    command: "npm install -g @yodaos-pkg/aix-cli"
+  },
+  {
+    id: "cargo",
+    label: "cargo",
+    command: "cargo install aiui-aix-cli"
+  }
+] as const;
+
+const activeInstallId = ref<(typeof installOptions)[number]["id"]>("npm");
+const copiedInstallId = ref<(typeof installOptions)[number]["id"] | null>(null);
+const activeInstall = computed(
+  () => installOptions.find((item) => item.id === activeInstallId.value) ?? installOptions[0]
+);
+const activeInstallIndex = computed(() =>
+  Math.max(
+    0,
+    installOptions.findIndex((item) => item.id === activeInstallId.value)
+  )
+);
+
+async function copyActiveInstallCommand() {
+  const command = activeInstall.value.command;
+
+  try {
+    await navigator.clipboard.writeText(command);
+  } catch {
+    const textarea = document.createElement("textarea");
+    textarea.value = command;
+    textarea.setAttribute("readonly", "true");
+    textarea.style.position = "absolute";
+    textarea.style.left = "-9999px";
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    document.body.removeChild(textarea);
+  }
+
+  copiedInstallId.value = activeInstall.value.id;
+  window.setTimeout(() => {
+    if (copiedInstallId.value === activeInstall.value.id) {
+      copiedInstallId.value = null;
+    }
+  }, 1600);
+}
+
 const specHref = withBase("/spec");
 const packagesHref = withBase("/packages");
 const playHref = withBase("/play");
@@ -107,6 +158,85 @@ const playHref = withBase("/play");
         </div>
 
         <PackageTreeDemo />
+      </div>
+    </section>
+
+    <section class="aix-doc-install-section">
+      <div class="aix-doc-container">
+        <div class="aix-doc-install-shell">
+          <div class="aix-doc-install" aria-label="CLI installation commands">
+            <p class="aix-doc-install-title">Start with the CLI.</p>
+            <div class="aix-doc-install-tabs" role="tablist" aria-label="Install method">
+              <span
+                class="aix-doc-install-tab-indicator"
+                aria-hidden="true"
+                :style="{
+                  width: `calc(${100 / installOptions.length}% - 4px)`,
+                  transform: `translateX(${activeInstallIndex * 100}%)`
+                }"
+              />
+              <button
+                v-for="option in installOptions"
+                :key="option.id"
+                type="button"
+                class="aix-doc-install-tab"
+                :class="{ 'is-active': option.id === activeInstallId }"
+                role="tab"
+                :aria-selected="option.id === activeInstallId"
+                @click="activeInstallId = option.id"
+              >
+                {{ option.label }}
+              </button>
+            </div>
+            <div class="aix-doc-install-command-row">
+              <pre class="aix-doc-install-command"><code>{{ activeInstall.command }}</code></pre>
+              <button
+                type="button"
+                class="aix-doc-install-copy"
+                :aria-label="`Copy ${activeInstall.label} install command`"
+                @click="copyActiveInstallCommand"
+              >
+                <svg
+                  v-if="copiedInstallId === activeInstall.id"
+                  class="aix-doc-install-copy-icon"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M4.75 10.25L8.25 13.75L15.25 6.75"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+                <svg
+                  v-else
+                  class="aix-doc-install-copy-icon"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M7 5.5H5.75C5.06 5.5 4.5 6.06 4.5 6.75V14.25C4.5 14.94 5.06 15.5 5.75 15.5H13.25C13.94 15.5 14.5 14.94 14.5 14.25V13"
+                    stroke="currentColor"
+                    stroke-width="1.4"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M8.75 12.5H14.25C14.94 12.5 15.5 11.94 15.5 11.25V5.75C15.5 5.06 14.94 4.5 14.25 4.5H8.75C8.06 4.5 7.5 5.06 7.5 5.75V11.25C7.5 11.94 8.06 12.5 8.75 12.5Z"
+                    stroke="currentColor"
+                    stroke-width="1.4"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
