@@ -230,6 +230,76 @@ impl AixReader {
         &self.entries
     }
 
+    /// Returns the original `.aix` archive bytes borrowed from this reader.
+    ///
+    /// This is a zero-copy view of the package buffer passed to [`Self::new`].
+    /// It is useful when callers need to forward the original archive without
+    /// re-reading or re-serializing it.
+    ///
+    /// # Returns
+    ///
+    /// Returns a borrowed byte slice containing the exact package bytes used to
+    /// construct this reader.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use aiui_aix::AixReader;
+    /// use std::io::{Cursor, Write};
+    /// use zip::write::FileOptions;
+    ///
+    /// # fn main() -> anyhow::Result<()> {
+    /// let mut bytes = Vec::new();
+    /// {
+    ///     let mut zip = zip::ZipWriter::new(Cursor::new(&mut bytes));
+    ///     zip.start_file("app.json", FileOptions::default())?;
+    ///     zip.write_all(br#"{"pages":[]}"#)?;
+    ///     zip.finish()?;
+    /// }
+    ///
+    /// let reader = AixReader::new(bytes.clone())?;
+    /// assert_eq!(reader.as_bytes(), bytes.as_slice());
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn as_bytes(&self) -> &[u8] {
+        self.data.as_slice()
+    }
+
+    /// Consumes the reader and returns the original `.aix` archive bytes.
+    ///
+    /// Use this when ownership of the underlying package buffer needs to move
+    /// out of the reader without cloning.
+    ///
+    /// # Returns
+    ///
+    /// Returns the exact byte vector originally supplied to [`Self::new`].
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use aiui_aix::AixReader;
+    /// use std::io::{Cursor, Write};
+    /// use zip::write::FileOptions;
+    ///
+    /// # fn main() -> anyhow::Result<()> {
+    /// let mut bytes = Vec::new();
+    /// {
+    ///     let mut zip = zip::ZipWriter::new(Cursor::new(&mut bytes));
+    ///     zip.start_file("app.json", FileOptions::default())?;
+    ///     zip.write_all(br#"{"pages":[]}"#)?;
+    ///     zip.finish()?;
+    /// }
+    ///
+    /// let reader = AixReader::new(bytes.clone())?;
+    /// assert_eq!(reader.into_bytes(), bytes);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn into_bytes(self) -> Vec<u8> {
+        self.data
+    }
+
     /// Reads and verifies a single file from the package.
     ///
     /// This method re-opens the in-memory ZIP archive, locates the named entry,
@@ -861,6 +931,15 @@ mod tests {
         let tool_json = serde_json::to_value(&tools[0]).unwrap();
         assert_eq!(tool_json["target"], "_current");
         assert_eq!(tool_json["function"]["parameters"]["type"], "object");
+    }
+
+    #[test]
+    fn exposes_original_archive_bytes() {
+        let data = create_test_aix();
+        let reader = AixReader::new(data.clone()).unwrap();
+
+        assert_eq!(reader.as_bytes(), data.as_slice());
+        assert_eq!(reader.into_bytes(), data);
     }
 
     #[test]
