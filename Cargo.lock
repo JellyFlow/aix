@@ -19,7 +19,7 @@ dependencies = [
 
 [[package]]
 name = "aiui-aix"
-version = "0.8.0"
+version = "0.8.1"
 dependencies = [
  "anyhow",
  "ed25519-dalek",
@@ -40,7 +40,7 @@ dependencies = [
 
 [[package]]
 name = "aiui-aix-cli"
-version = "0.8.0"
+version = "0.8.1"
 dependencies = [
  "aiui-aix",
  "aiui-aix-pack",
@@ -53,7 +53,7 @@ dependencies = [
 
 [[package]]
 name = "aiui-aix-pack"
-version = "0.8.0"
+version = "0.8.1"
 dependencies = [
  "aiui-aix",
  "anyhow",
@@ -74,7 +74,7 @@ dependencies = [
 
 [[package]]
 name = "aiui-aix-web"
-version = "0.8.0"
+version = "0.8.1"
 dependencies = [
  "aiui-aix",
  "aiui-aix-pack",
