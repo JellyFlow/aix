@@ -15,7 +15,7 @@ The directory name, Cargo package name, and npm package name all differ. Use the
 | `packages/cli` | — | npm CLI `@yodaos-pkg/aix-cli`. TS shell over the same WASM engine. Install via `npm install -g @yodaos-pkg/aix-cli`. |
 | `docs/` | — | VitePress site (`/spec`, `/cli`, `/packages`, `/play`). |
 
-All four crates are versioned `0.7.0`. Dependencies embed both `path` and `version`, so bump versions across `crates/*/Cargo.toml` together.
+All four crates are versioned `0.8.0`. Dependencies embed both `path` and `version`, so bump versions across `crates/*/Cargo.toml` together.
 
 ## CLI surfaces (two install paths, one `aix` command)
 
