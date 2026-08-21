@@ -56,6 +56,7 @@ export default defineConfig({
       { text: "CLI", link: "/cli" },
       { text: "Packages", link: "/packages" },
       { text: "Play", link: "/play" },
+      { text: "ZH", link: "/index.zh-CN" },
       { text: "GitHub", link: "https://github.com/jsar-project/aix" }
     ],
     sidebar: [
@@ -65,6 +66,16 @@ export default defineConfig({
           { text: "Specification", link: "/spec" },
           { text: "CLI", link: "/cli" },
           { text: "Packages", link: "/packages" }
+        ]
+      },
+      {
+        text: "AIX ZH",
+        items: [
+          { text: "首页", link: "/index.zh-CN" },
+          { text: "格式规范", link: "/spec.zh-CN" },
+          { text: "CLI", link: "/cli.zh-CN" },
+          { text: "代码组件", link: "/packages.zh-CN" },
+          { text: "在线工具", link: "/play.zh-CN" }
         ]
       }
     ],
