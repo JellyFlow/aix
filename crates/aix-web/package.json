@@ -1,6 +1,6 @@
 {
   "name": "@yodaos-pkg/aix",
-  "version": "0.8.2",
+  "version": "0.9.0",
   "description": "Ink AIX Package Reader",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
