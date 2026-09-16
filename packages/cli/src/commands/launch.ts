@@ -533,7 +533,7 @@ export async function cmdInstall(projectInput: string, options: InstallOptions) 
     });
     const status = await runStep("Checking phone upload", `Agent installed: ${agentName}`, async () => {
       const value = parseDevelopResult(await runAdb(serial, contentCall("status", applied.operationId as string)));
-      requireEmptyErrorCode(value, "status");
+      requireInstallStatus(value, input, isProject);
       const state = String(value.publishState ?? "UNKNOWN");
       if (["FAILED_RETRYABLE", "FAILED_PERMANENT"].includes(state)) throw new Error(`Upload stopped with publishState=${state}.`);
       return value;
@@ -549,6 +549,22 @@ export async function cmdInstall(projectInput: string, options: InstallOptions) 
   } finally {
     fs.rmSync(temporary, { recursive: true, force: true });
   }
+}
+
+function requireInstallStatus(result: DevelopResult, input: string, isProject: boolean): void {
+  const code = String(result.errorCode ?? "");
+  if (code === "PROJECTION_ENGINE_INCOMPATIBLE" || code === "ENGINE_INCOMPATIBLE") {
+    const detail = typeof result.message === "string" && result.message ? `\nDevice message: ${result.message}` : "";
+    const recommendation = isProject
+      ? `Retry with a compatible engine range:\n  aix install ${shellQuote(input)} --engine '>=0.17.0'`
+      : `This input is already packaged, so install cannot override its engine range.\nRepack the source project first:\n  aix pack <PROJECT> --engine '>=0.17.0' -o bundle.aix\n  aix install bundle.aix`;
+    throw new Error(`The package engine range is incompatible with the device Ink runtime.${detail}\n${recommendation}\nError code: ${code}`);
+  }
+  requireEmptyErrorCode(result, "status");
+}
+
+function shellQuote(value: string): string {
+  return `'${value.split("'").join(`'"'"'`)}'`;
 }
 
 function readLaunchMetadata(input: string, isProject: boolean): {

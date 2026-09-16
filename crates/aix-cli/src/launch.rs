@@ -836,7 +836,7 @@ pub(crate) fn install_agent(input: &Path, options: InstallOptions<'_>) -> Result
         &serial,
         &content_call("status", Some(operation_id)),
     )?)?;
-    require_empty_error_code(&status, "status")?;
+    require_install_status(&status, &resolved.input, resolved.is_project)?;
     let publish_state = status
         .get("publishState")
         .and_then(Value::as_str)
@@ -1145,6 +1145,34 @@ fn require_empty_error_code(result: &Value, stage: &str) -> Result<()> {
     Ok(())
 }
 
+fn require_install_status(result: &Value, input: &Path, is_project: bool) -> Result<()> {
+    let code = result
+        .get("errorCode")
+        .and_then(Value::as_str)
+        .unwrap_or("");
+    if ["PROJECTION_ENGINE_INCOMPATIBLE", "ENGINE_INCOMPATIBLE"].contains(&code) {
+        let message = result
+            .get("message")
+            .or_else(|| result.get("errorMessage"))
+            .and_then(Value::as_str)
+            .filter(|message| !message.is_empty())
+            .map(|message| format!("\nDevice message: {message}"))
+            .unwrap_or_default();
+        let recommendation = if is_project {
+            format!(
+                "Retry with a compatible engine range:\n  aix install {} --engine '>=0.17.0'",
+                shell_quote(&input.to_string_lossy())
+            )
+        } else {
+            "This input is already packaged, so install cannot override its engine range.\nRepack the source project first:\n  aix pack <PROJECT> --engine '>=0.17.0' -o bundle.aix\n  aix install bundle.aix".to_owned()
+        };
+        bail!(
+            "The package engine range is incompatible with the device Ink runtime.{message}\n{recommendation}\nError code: {code}"
+        );
+    }
+    require_empty_error_code(result, "status")
+}
+
 fn require_ok(result: &Value, stage: &str) -> Result<()> {
     require_empty_error_code(result, stage)?;
     if result.get("ok").and_then(Value::as_bool) != Some(true) {
@@ -1393,5 +1421,23 @@ mod tests {
             Some(0),
         )
         .is_err());
+    }
+
+    #[test]
+    fn explains_projection_engine_incompatibility_with_retry_command() {
+        let error = require_install_status(
+            &serde_json::json!({
+                "errorCode":"PROJECTION_ENGINE_INCOMPATIBLE",
+                "message":"Ink runtime does not satisfy ^0.15.0"
+            }),
+            Path::new("/tmp/My Agent"),
+            true,
+        )
+        .unwrap_err()
+        .to_string();
+        assert!(error.contains("package engine range is incompatible"));
+        assert!(error.contains("Ink runtime does not satisfy ^0.15.0"));
+        assert!(error.contains("aix install '/tmp/My Agent' --engine '>=0.17.0'"));
+        assert!(error.contains("PROJECTION_ENGINE_INCOMPATIBLE"));
     }
 }
