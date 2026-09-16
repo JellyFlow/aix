@@ -4,6 +4,26 @@
 
 用于打包、查看、安装和预览 **AIX**（AI eXecutable）Agent 包的命令行工具。
 
+## 目录
+
+- [安装](#安装)
+- [包管理命令](#包管理命令)
+  - [`aix pack`](#aix-pack-input_dir)
+  - [`aix show`](#aix-show-input)
+  - [`aix list`](#aix-list-aix_file)
+  - [`aix optimize`](#aix-optimize-aix_file)
+- [设备命令](#设备命令)
+  - [`aix device`](#aix-device-action)
+  - [`aix install`](#aix-install-input)
+  - [`aix launch-page`](#aix-launch-page-input-path)
+  - [`aix launch-widget`](#aix-launch-widget-input-path)
+  - [`aix widget-layout`](#aix-widget-layout-show)
+- [预览命令](#预览命令)
+  - [`aix preview`](#aix-preview-input)
+  - [`aix runtime`](#aix-runtime)
+- [开发](#开发)
+- [许可证](#许可证)
+
 ## 安装
 
 ```bash

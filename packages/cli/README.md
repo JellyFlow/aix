@@ -5,6 +5,26 @@
 Command-line tool for packing, inspecting, installing, and previewing **AIX**
 (AI eXecutable) packages.
 
+## Table of Contents
+
+- [Installation](#installation)
+- [Package Commands](#package-commands)
+  - [`aix pack`](#aix-pack-input_dir)
+  - [`aix show`](#aix-show-input)
+  - [`aix list`](#aix-list-aix_file)
+  - [`aix optimize`](#aix-optimize-aix_file)
+- [Device Commands](#device-commands)
+  - [`aix device`](#aix-device-action)
+  - [`aix install`](#aix-install-input)
+  - [`aix launch-page`](#aix-launch-page-input-path)
+  - [`aix launch-widget`](#aix-launch-widget-input-path)
+  - [`aix widget-layout`](#aix-widget-layout-show)
+- [Preview Commands](#preview-commands)
+  - [`aix preview`](#aix-preview-input)
+  - [`aix runtime`](#aix-runtime)
+- [Development](#development)
+- [License](#license)
+
 ## Installation
 
 ```bash
