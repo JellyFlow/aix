@@ -225,6 +225,9 @@ npm run dev
 
 ## 开发
 
+版本策略、发布检查清单、crate 发布 workflow 和 npm 发布命令请参阅
+[RELEASING.zh-CN.md](./RELEASING.zh-CN.md)。
+
 在仓库根目录进行基础校验：
 
 ```bash

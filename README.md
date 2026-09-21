@@ -251,6 +251,9 @@ npm run dev
 
 ## Development
 
+See [RELEASING.md](./RELEASING.md) for the versioning policy, release checklist,
+crate publishing workflow, and npm publishing commands.
+
 Validate the workspace from the repository root:
 
 ```bash
