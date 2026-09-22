@@ -1,8 +1,10 @@
 # AIX Format Specification
 
-**Status:** Draft implementation specification
-**Format identifier:** `aix`
-**Document scope:** package bytes and their normative interpretation
+| Specification metadata | Value |
+| --- | --- |
+| Status | Draft implementation specification |
+| Format identifier | `aix` |
+| Document scope | Package bytes and their normative interpretation |
 
 This document specifies the AIX file format. It is intentionally independent
 of any programming language, command-line interface, reader library, browser

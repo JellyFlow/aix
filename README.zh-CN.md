@@ -13,7 +13,7 @@ AIX 是一种面向 AI agents 的可执行包格式。
 - `crates/aix-cli`：原生 Rust 命令行入口（`aiui-aix-cli`），二进制名 `aix`
 - `crates/aix-web`：面向浏览器的 WASM 和 TypeScript 接口
 - `packages/cli`：通过 npm 发布的命令行入口（`@yodaos-pkg/aix-cli`），基于同一 WASM 引擎的 TypeScript 壳
-- `docs`：官方文档站，包含 `Specification`、`Packages` 和 `Play`
+- `docs`：官方文档站，包含 `Specification`、`API` 和 `Play`
 
 ## Workspace 结构
 
@@ -43,7 +43,7 @@ AIX 是一种面向 AI agents 的可执行包格式。
 
 因此，同一个 `.aix` 包可以被 Rust、CLI 和 Web/WASM 工具链读取，而不丢失其原生结构。
 
-## Packages
+## API
 
 ### `crates/aix`
 
@@ -212,7 +212,7 @@ async function inspect(file: File) {
 文档站位于 `docs/`，当前主要包括三个路由：
 
 - `/spec`：AIX Specification 概览
-- `/packages`：workspace 中各 package 的职责
+- `/api`：`@yodaos-pkg/aix` WebAssembly 和 TypeScript API 参考
 - `/play`：在浏览器里上传并检查真实的 `.aix` artifact
 
 本地启动：

@@ -13,7 +13,7 @@ This repository centers on a Rust workspace with these package-facing surfaces:
 - `crates/aix-cli`: the native Rust CLI (`aiui-aix-cli`), binary named `aix`
 - `crates/aix-web`: the WASM and TypeScript surface for browser-based AIX inspection and integration
 - `packages/cli`: the npm-published CLI (`@yodaos-pkg/aix-cli`), a TypeScript shell over the same WASM engine
-- `docs`: the official documentation site, including `Specification`, `Packages`, and `Play`
+- `docs`: the official documentation site, including `Specification`, `API`, and `Play`
 
 ## Workspace Layout
 
@@ -45,7 +45,7 @@ An `.aix` package is more than a zip archive. It is a structured artifact that c
 
 In practice, the same package can be read by Rust, CLI, and Web/WASM tooling without losing the package-native structure.
 
-## Packages
+## API
 
 ### `crates/aix`
 
@@ -238,7 +238,7 @@ For packaged artifacts, `supportsEngine()` reads the resolved engine range from
 The documentation site lives in `docs/` and is organized around three primary routes:
 
 - `/spec`: the AIX specification overview
-- `/packages`: the workspace package surfaces
+- `/api`: the `@yodaos-pkg/aix` WebAssembly and TypeScript API reference
 - `/play`: upload and inspect real `.aix` artifacts in the browser
 
 Run it locally:

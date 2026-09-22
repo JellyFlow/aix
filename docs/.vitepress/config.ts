@@ -54,7 +54,7 @@ export default defineConfig({
     nav: [
       { text: "Specification", link: "/spec" },
       { text: "CLI", link: "/cli" },
-      { text: "Packages", link: "/packages" },
+      { text: "API", link: "/api" },
       { text: "Play", link: "/play" },
       { text: "GitHub", link: "https://github.com/jsar-project/aix" }
     ],
@@ -64,7 +64,7 @@ export default defineConfig({
         items: [
           { text: "Specification", link: "/spec" },
           { text: "CLI", link: "/cli" },
-          { text: "Packages", link: "/packages" }
+          { text: "API", link: "/api" }
         ]
       }
     ],
