@@ -95,6 +95,22 @@ body {
   font-weight: 500;
 }
 
+/* The query-based locale routes all resolve to the same document path, so
+ * VitePress marks every alternative language link as active. In the language
+ * menu, the title already identifies the current locale; keep the alternatives
+ * neutral and reserve the brand color for interaction feedback. */
+.VPNavBarTranslations .VPMenuLink .link.active,
+.VPNavBarExtra .translations .VPMenuLink .link.active {
+  color: var(--vp-c-text-1);
+}
+
+.VPNavBarTranslations .VPMenuLink .link.active:hover,
+.VPNavBarTranslations .VPMenuLink .link.active:focus-visible,
+.VPNavBarExtra .translations .VPMenuLink .link.active:hover,
+.VPNavBarExtra .translations .VPMenuLink .link.active:focus-visible {
+  color: var(--vp-c-brand-1);
+}
+
 .VPSidebar .group {
   margin-top: 12px;
 }
@@ -189,6 +205,40 @@ html[lang="zh-CN"] .aix-doc-command-label {
 html[lang="zh-CN"] code,
 html[lang="zh-CN"] pre,
 html[lang="zh-CN"] kbd {
+  font-family: var(--vp-font-family-mono);
+}
+
+/* Japanese locale: Klee One is the original Japanese typeface that inspired LXGW WenKai. */
+html[lang="ja"] body,
+html[lang="ja"] button,
+html[lang="ja"] input,
+html[lang="ja"] .vp-doc,
+html[lang="ja"] .VPNavBar,
+html[lang="ja"] .VPSidebar {
+  font-family: "Klee One", "Yu Kyokasho", "Hiragino Mincho ProN", serif;
+}
+
+html[lang="ja"] h1,
+html[lang="ja"] h2,
+html[lang="ja"] h3,
+html[lang="ja"] h4,
+html[lang="ja"] h5,
+html[lang="ja"] h6,
+html[lang="ja"] .VPNavBarTitle,
+html[lang="ja"] .VPNavBarMenuLink,
+html[lang="ja"] .VPButton,
+html[lang="ja"] .aix-doc-hero-title,
+html[lang="ja"] .aix-doc-section-head h2,
+html[lang="ja"] .aix-doc-card h3,
+html[lang="ja"] .aix-doc-step h3,
+html[lang="ja"] .aix-doc-package-meta {
+  font-family: "Avenir Next", "Inter", "Klee One", sans-serif;
+  font-weight: 600;
+}
+
+html[lang="ja"] code,
+html[lang="ja"] pre,
+html[lang="ja"] kbd {
   font-family: var(--vp-font-family-mono);
 }
 
@@ -360,59 +410,6 @@ html[lang="zh-CN"] kbd {
   letter-spacing: -0.055em;
   font-weight: 600;
   text-wrap: balance;
-}
-
-.aix-doc-install-tabs {
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0;
-  padding: 4px;
-  border-radius: 999px;
-  background: rgba(23, 29, 40, 0.05);
-  overflow: hidden;
-}
-
-.aix-doc-install-tab-indicator {
-  position: absolute;
-  top: 4px;
-  bottom: 4px;
-  left: 4px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 2px 8px rgba(31, 39, 53, 0.06);
-  transition:
-    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
-    width 0.28s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.aix-doc-install-tab {
-  position: relative;
-  z-index: 1;
-  min-height: 34px;
-  padding: 0 14px;
-  border: 0;
-  border-radius: 999px;
-  background: transparent;
-  color: var(--aix-muted);
-  font-weight: 600;
-  cursor: pointer;
-  transition:
-    background-color 0.2s ease,
-    color 0.2s ease,
-    transform 0.2s ease;
-}
-
-.aix-doc-install-tab:hover {
-  color: var(--aix-ink);
-}
-
-.aix-doc-install-tab:active {
-  transform: translateY(1px);
-}
-
-.aix-doc-install-tab.is-active {
-  color: var(--aix-ink);
 }
 
 .aix-doc-install-command-row {
@@ -2434,10 +2431,6 @@ html[lang="zh-CN"] kbd {
 
   .aix-doc-install-section {
     padding: 20px 0 28px;
-  }
-
-  .aix-doc-install-tabs {
-    display: flex;
   }
 
   .aix-doc-install-command-row {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { ref } from "vue";
 import { withBase } from "vitepress";
 import PackageTreeDemo from "./PackageTreeDemo.vue";
 
@@ -86,30 +86,15 @@ const packageSections = [
   }
 ];
 
-const installOptions = [
-  { id: "npm", label: "npm", command: "npm install -g @yodaos-pkg/aix-cli" }
-] as const;
-
-const activeInstallId = ref<(typeof installOptions)[number]["id"]>("npm");
-const copiedInstallId = ref<(typeof installOptions)[number]["id"] | null>(null);
-const activeInstall = computed(
-  () => installOptions.find((item) => item.id === activeInstallId.value) ?? installOptions[0]
-);
-const activeInstallIndex = computed(() =>
-  Math.max(
-    0,
-    installOptions.findIndex((item) => item.id === activeInstallId.value)
-  )
-);
+const installCommand = "npm install -g @yodaos-pkg/aix-cli";
+const installCommandCopied = ref(false);
 
 async function copyActiveInstallCommand() {
-  const command = activeInstall.value.command;
-
   try {
-    await navigator.clipboard.writeText(command);
+    await navigator.clipboard.writeText(installCommand);
   } catch {
     const textarea = document.createElement("textarea");
-    textarea.value = command;
+    textarea.value = installCommand;
     textarea.setAttribute("readonly", "true");
     textarea.style.position = "absolute";
     textarea.style.left = "-9999px";
@@ -119,11 +104,9 @@ async function copyActiveInstallCommand() {
     document.body.removeChild(textarea);
   }
 
-  copiedInstallId.value = activeInstall.value.id;
+  installCommandCopied.value = true;
   window.setTimeout(() => {
-    if (copiedInstallId.value === activeInstall.value.id) {
-      copiedInstallId.value = null;
-    }
+    installCommandCopied.value = false;
   }, 1600);
 }
 
@@ -157,38 +140,16 @@ const playHref = withBase("/play");
         <div class="aix-doc-install-shell">
           <div class="aix-doc-install" aria-label="CLI installation commands">
             <p class="aix-doc-install-title">Start with the CLI.</p>
-            <div class="aix-doc-install-tabs" role="tablist" aria-label="Install method">
-              <span
-                class="aix-doc-install-tab-indicator"
-                aria-hidden="true"
-                :style="{
-                  width: `calc(${100 / installOptions.length}% - 4px)`,
-                  transform: `translateX(${activeInstallIndex * 100}%)`
-                }"
-              />
-              <button
-                v-for="option in installOptions"
-                :key="option.id"
-                type="button"
-                class="aix-doc-install-tab"
-                :class="{ 'is-active': option.id === activeInstallId }"
-                role="tab"
-                :aria-selected="option.id === activeInstallId"
-                @click="activeInstallId = option.id"
-              >
-                {{ option.label }}
-              </button>
-            </div>
             <div class="aix-doc-install-command-row">
-              <pre class="aix-doc-install-command"><code>{{ activeInstall.command }}</code></pre>
+              <pre class="aix-doc-install-command"><code>{{ installCommand }}</code></pre>
               <button
                 type="button"
                 class="aix-doc-install-copy"
-                :aria-label="`Copy ${activeInstall.label} install command`"
+                aria-label="Copy npm install command"
                 @click="copyActiveInstallCommand"
               >
                 <svg
-                  v-if="copiedInstallId === activeInstall.id"
+                  v-if="installCommandCopied"
                   class="aix-doc-install-copy-icon"
                   viewBox="0 0 20 20"
                   fill="none"

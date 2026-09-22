@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed } from "vue";
+
 export interface TreeNodeData {
   id: string;
   name: string;
@@ -15,6 +17,7 @@ const props = defineProps<{
   depth: number;
   selectedId: string;
   expanded: Record<string, boolean>;
+  locale?: "en" | "zh-CN" | "ja";
 }>();
 
 const emit = defineEmits<{
@@ -23,6 +26,8 @@ const emit = defineEmits<{
 }>();
 
 const isDirectory = props.node.kind === "directory";
+const isZh = computed(() => props.locale === "zh-CN");
+const isJa = computed(() => props.locale === "ja");
 </script>
 
 <template>
@@ -37,7 +42,9 @@ const isDirectory = props.node.kind === "directory";
         class="aix-tree-toggle"
         type="button"
         @click="emit('toggle', node.id)"
-        :aria-label="expanded[node.id] ? `Collapse ${node.name}` : `Expand ${node.name}`"
+        :aria-label="expanded[node.id]
+          ? `${isZh ? '收起' : isJa ? '折りたたむ' : 'Collapse'} ${node.name}`
+          : `${isZh ? '展开' : isJa ? '展開する' : 'Expand'} ${node.name}`"
       >
         {{ expanded[node.id] ? "−" : "+" }}
       </button>
@@ -60,6 +67,7 @@ const isDirectory = props.node.kind === "directory";
         :depth="depth + 1"
         :selected-id="selectedId"
         :expanded="expanded"
+        :locale="locale"
         @toggle="emit('toggle', $event)"
         @select="emit('select', $event)"
       />

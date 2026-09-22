@@ -58,9 +58,21 @@ const buildError = ref<string | null>(null);
 const buildReport = ref<OptimizeReport | null>(null);
 const optimizeBuild = ref(true);
 const optimizeLevel = ref<1 | 2 | 3>(2);
-const locale = ref<"en" | "zh-CN">("en");
+const locale = ref<"en" | "zh-CN" | "ja">("en");
 
-const text = computed(() => locale.value === "zh-CN" ? {
+const text = computed(() => locale.value === "ja" ? {
+  play: "プレイ", hint: "ブラウザーで AIX パッケージを検査、作成します。", inspect: "検査", build: "作成",
+  reading: "パッケージを読み込み中…", replacePackage: "パッケージを置換", uploadPackage: "パッケージをアップロード",
+  replaceDirectory: "ディレクトリを置換", chooseDirectory: "ディレクトリを選択", error: "エラー：",
+  noDirectory: "ディレクトリが選択されていません", directory: "ディレクトリ", files: "ファイル", sourceSize: "ソースサイズ",
+  optimize: "リソースを最適化", level: "レベル", building: "パッケージを作成中…", buildDownload: "作成してダウンロード",
+  downloaded: "パッケージをダウンロードしました", saved: "削減", noPackage: "パッケージが読み込まれていません",
+  compressed: "圧縮後", preview: "プレビュー", notPreviewable: "このファイルは UTF-8 テキストとしてプレビューできません。",
+  noPreview: "プレビュー可能なファイルが選択されていません。", details: "パッケージ詳細", meta: "メタデータ",
+  pages: "ページ", tools: "ツール", untitled: "無題のページ", schema: "Schema", noSchema: "Schema なし",
+  noPages: "ページがありません。", noTools: "ツールがありません。", title: "タイトル", version: "バージョン",
+  entries: "エントリー", unknown: "不明"
+} : locale.value === "zh-CN" ? {
   play: "体验",
   hint: "在浏览器中检查和构建 AIX 包。",
   inspect: "检查",
@@ -163,8 +175,9 @@ const directorySize = computed(() => directoryFiles.value.reduce((total, file) =
 const hasDirectory = computed(() => directoryFiles.value.length > 0);
 
 if (typeof window !== "undefined") {
-  locale.value = new URLSearchParams(window.location.search).get("lang") === "zh-CN"
-    || window.location.pathname.includes("/zh-CN/") ? "zh-CN" : "en";
+  const routeLocale = new URLSearchParams(window.location.search).get("lang");
+  locale.value = routeLocale === "zh-CN" || window.location.pathname.includes("/zh-CN/")
+    ? "zh-CN" : routeLocale === "ja" || window.location.pathname.includes("/ja/") ? "ja" : "en";
 }
 
 function resetState() {
@@ -458,7 +471,7 @@ function formatTool(tool: LabTool): string {
       <section class="lab-workspace">
         <aside class="lab-sidebar">
           <div class="lab-panel-head">
-            <h2>Files</h2>
+            <h2>{{ text.files }}</h2>
             <span class="lab-count">{{ entries.length }}</span>
           </div>
           <div class="lab-file-list">

@@ -2,8 +2,9 @@
 import { computed, reactive, ref } from "vue";
 import TreeNodeItem, { type TreeNodeData } from "./TreeNodeItem.vue";
 
-const props = defineProps<{ locale?: "en" | "zh-CN" }>();
+const props = defineProps<{ locale?: "en" | "zh-CN" | "ja" }>();
 const isZh = computed(() => props.locale === "zh-CN");
+const isJa = computed(() => props.locale === "ja");
 
 const tree: TreeNodeData = {
   id: "root",
@@ -126,6 +127,17 @@ const selectedNode = computed(
 
 const selectedDisplay = computed(() => {
   const node = selectedNode.value;
+  if (isJa.value) {
+    const translations: Record<string, { role: string; carries: string[]; downstream: string }> = {
+      root: { role: "アーカイブ本体です。ここからメタデータ、ページ、アセットをたどります。", carries: ["アーカイブエントリー", "ディレクトリ階層", "アプリ境界"], downstream: "すべての AIX 解析はこのルートから始まります。" },
+      version: { role: "パッケージ作成時に生成されたバージョン識別子です。", carries: ["バージョン UUID", "パッケージ識別子"], downstream: "最上位のパッケージメタデータとして表示されます。" },
+      "app-json": { role: "アプリ設定と、パッケージ画面を構成するページ一覧を宣言します。", carries: ["ページルート", "ウィンドウ設定", "パッケージの目的"], downstream: "アプリ名と検査対象ページの解決に使用します。" },
+      pages: { role: "UI 構造、メタデータ、Schema を定義するページファイルです。", carries: ["ページ設定", "レイアウト", "Schema"], downstream: "ページ情報とツール契約の生成に使用します。" },
+      index: { role: "従来型の複数ファイルページです。", carries: ["メタデータ", "テンプレート", "スタイル"], downstream: "ページ概要とレイアウト制約に統合されます。" },
+      assets: { role: "アプリから参照される静的リソースです。", carries: ["アイコン", "画像", "その他のアセット"], downstream: "読み取り可能なエントリーとして表示されます。" }
+    };
+    return { ...node, ...(translations[node.id] ?? {}) };
+  }
   if (!isZh.value) return node;
   const translations: Record<string, { role: string; carries: string[]; downstream: string }> = {
     root: { role: "归档本身。阅读器从这里开始，依次进入元数据、页面和资源。", carries: ["归档条目", "目录层级", "应用包边界"], downstream: "所有 AIX 解析都从这个根归档开始。" },
@@ -156,8 +168,8 @@ function selectNode(node: TreeNodeData) {
   <div class="aix-tree-demo">
     <div class="aix-tree-shell">
       <div class="aix-tree-header">
-        <strong>{{ isZh ? "包结构示例" : "Package Structure Demo" }}</strong>
-        <span>{{ isZh ? "展示 `.aix` 归档如何保持可读。" : "Interactive example of how an `.aix` artifact stays readable." }}</span>
+        <strong>{{ isZh ? "包结构示例" : isJa ? "パッケージ構造の例" : "Package Structure Demo" }}</strong>
+        <span>{{ isZh ? "展示 `.aix` 归档如何保持可读。" : isJa ? "`.aix` アーカイブの読みやすい構造を示します。" : "Interactive example of how an `.aix` artifact stays readable." }}</span>
       </div>
 
       <div class="aix-tree-layout">
@@ -168,6 +180,7 @@ function selectNode(node: TreeNodeData) {
               :depth="0"
               :selected-id="selectedId"
               :expanded="expanded"
+              :locale="locale"
               @toggle="toggleNode"
               @select="selectNode"
             />
@@ -175,19 +188,19 @@ function selectNode(node: TreeNodeData) {
         </div>
 
         <aside class="aix-tree-detail">
-          <p class="aix-tree-detail-label">{{ isZh ? "当前节点" : "Selected node" }}</p>
+          <p class="aix-tree-detail-label">{{ isZh ? "当前节点" : isJa ? "選択中のノード" : "Selected node" }}</p>
           <h3>{{ selectedDisplay.name }}</h3>
           <p>{{ selectedDisplay.role }}</p>
 
           <div class="aix-tree-detail-block">
-            <strong>{{ isZh ? "包含内容" : "Carries" }}</strong>
+            <strong>{{ isZh ? "包含内容" : isJa ? "内容" : "Carries" }}</strong>
             <ul>
               <li v-for="item in selectedDisplay.carries" :key="item">{{ item }}</li>
             </ul>
           </div>
 
           <div class="aix-tree-detail-block">
-            <strong>{{ isZh ? "下游用途" : "Downstream usage" }}</strong>
+            <strong>{{ isZh ? "下游用途" : isJa ? "利用先" : "Downstream usage" }}</strong>
             <p>{{ selectedDisplay.downstream }}</p>
           </div>
         </aside>
